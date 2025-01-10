@@ -1,3 +1,3 @@
-rootProject.name = "apitools"
+rootProject.name = "multitool"
 
 include("notion-api")
