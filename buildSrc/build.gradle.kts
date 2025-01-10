@@ -12,4 +12,5 @@ kotlin {
 }
 dependencies {
     implementation(libs.kotlin.gradle)
+    implementation(libs.kotlin.serialization.gradle)
 }
