@@ -1,0 +1,6 @@
+on: [pull_request]
+jobs:
+    tests:
+        uses: inkapplications/.github/.github/workflows/kmp-checks.yml@1.2.0
+        with:
+            java-version: 23
