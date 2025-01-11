@@ -10,6 +10,5 @@ interface NotionApi
         token: NotionBearerToken,
         database: DatabaseId,
         query: DatabaseQuery,
-        ): NotionResponse.ListResponse<Page>
-
+    ): NotionResponse.ListResponse<Page>
 }

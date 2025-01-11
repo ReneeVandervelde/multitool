@@ -21,7 +21,7 @@ sealed interface RichText
     }
 }
 
-private class RichTextSerializer: KSerializer<RichText>
+internal class RichTextSerializer: KSerializer<RichText>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 

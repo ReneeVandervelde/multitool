@@ -16,7 +16,7 @@ sealed interface PageIcon
     data object Unknown: PageIcon
 }
 
-private class PageIconSerializer: KSerializer<PageIcon>
+internal class PageIconSerializer: KSerializer<PageIcon>
 {
     @Serializable
     private data class PageIconSurrogate(

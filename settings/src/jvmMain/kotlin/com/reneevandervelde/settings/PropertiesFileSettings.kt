@@ -10,10 +10,14 @@ internal class PropertiesFileSettings(
 ): MultitoolSettings {
     override val allSettings: Flow<Map<String, String?>> = flow {
         val properties = Properties()
-        file.inputStream().use {
-            properties.load(it)
+        if (file.exists()) {
+            file.inputStream().use {
+                properties.load(it)
+            }
+            emit(properties.stringPropertyNames().associateWith { properties.getProperty(it) })
+        } else {
+            emit(emptyMap())
         }
-        emit(properties.stringPropertyNames().associateWith { properties.getProperty(it) })
     }
 }
 

@@ -23,8 +23,23 @@ module="io.ktor:ktor-client-core"
 version.ref = "ktor"
 module="io.ktor:ktor-client-serialization"
 
+[libraries.ktor-client-contentnegotiation]
+version.ref = "ktor"
+module="io.ktor:ktor-client-content-negotiation"
+
+[libraries.ktor-serialization-json]
+version.ref = "ktor"
+module = "io.ktor:ktor-serialization-kotlinx-json"
+
+[libraries.ktor-client-cio]
+version.ref = "ktor"
+module="io.ktor:ktor-client-cio"
+
 [bundles]
 ktor-client = [
     "ktor-client-core",
     "ktor-client-serialization",
+    "ktor-client-contentnegotiation",
+    "ktor-serialization-json",
+    "ktor-client-cio",
 ]

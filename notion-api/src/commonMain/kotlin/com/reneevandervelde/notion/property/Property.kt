@@ -27,13 +27,18 @@ sealed interface Property
         val rich_text: List<RichTextBlock>,
     ): Property
 
+    data class Number(
+        override val id: PropertyId,
+        val number: kotlin.Number?,
+    ): Property
+
     data class UnknownPropertyType(
         override val id: PropertyId,
         val type: PropertyType,
     ): Property
 }
 
-private class PropertySerializer: KSerializer<Property>
+internal class PropertySerializer: KSerializer<Property>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
@@ -55,6 +60,10 @@ private class PropertySerializer: KSerializer<Property>
                 id = surrogate.id,
                 rich_text = surrogate.rich_text ?: error("rich_text property must be present")
             )
+            PropertyType.Nunber -> Property.Number(
+                id = surrogate.id,
+                number = surrogate.number
+            )
             else -> Property.UnknownPropertyType(
                 id = surrogate.id,
                 type = surrogate.type,
@@ -69,5 +78,6 @@ private class PropertySerializer: KSerializer<Property>
         val multi_select: List<MultiSelectOption>? = null,
         val title: List<RichTextBlock>? = null,
         val rich_text: List<RichTextBlock>? = null,
+        val number: Double? = null,
     )
 }

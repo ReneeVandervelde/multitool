@@ -11,5 +11,6 @@ value class PropertyType(val value: String)
         val MultiSelect = PropertyType("multi_select")
         val Title = PropertyType("title")
         val RichText = PropertyType("rich_text")
+        val Nunber = PropertyType("number")
     }
 }
