@@ -4,7 +4,6 @@ import com.reneevandervelde.notion.NotionModule
 import com.reneevandervelde.notion.block.RichText
 import com.reneevandervelde.notion.database.DatabaseQuery
 import com.reneevandervelde.notion.property.Property
-import com.reneevandervelde.notion.property.PropertyName
 import com.reneevandervelde.radio.settings.radioNotionSettings
 import com.reneevandervelde.settings.SettingsModule
 import kotlinx.coroutines.flow.first
@@ -21,12 +20,12 @@ fun main(args: Array<String>)
             query = DatabaseQuery()
         )
         result.results.forEach {
-            val name = it.properties[PropertyName("Name")]
+            val name = it.properties[RadioDatabaseProperties.Name]
                 .let { it as Property.Title }
                 .title
                 .map { it as RichText.Text }
                 .joinToString { it.plain_text }
-            val frequency = it.properties[PropertyName("Rx Freq")]
+            val frequency = it.properties[RadioDatabaseProperties.RxFrequency]
                 .let { it as Property.Number? }
                 ?.number
             println("$name @ $frequency")

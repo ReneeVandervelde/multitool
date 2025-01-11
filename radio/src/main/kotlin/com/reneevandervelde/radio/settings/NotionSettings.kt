@@ -1,5 +1,6 @@
 package com.reneevandervelde.radio.settings
 
+import com.reneevandervelde.notion.NOTION_SETTINGS_API_KEY
 import com.reneevandervelde.notion.NotionBearerToken
 import com.reneevandervelde.notion.database.DatabaseId
 import com.reneevandervelde.settings.MultitoolSettings
@@ -14,7 +15,7 @@ internal data class NotionSettings(
 internal val MultitoolSettings.radioNotionSettings: Flow<NotionSettings?>
     get() = allSettings.map {
         NotionSettings(
-            apiToken = it["notion-api-token"]
+            apiToken = it[NOTION_SETTINGS_API_KEY]
                 ?.let(::NotionBearerToken)
                 ?: return@map null,
             databaseId = it["notion-radio-database-id"]
