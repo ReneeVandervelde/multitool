@@ -20,12 +20,16 @@ sealed interface Property
     data class Title(
         override val id: PropertyId,
         val title: List<RichTextBlock>,
-    ): Property
+    ): Property {
+        fun toPlainText(): String = title.joinToString { it.plain_text.orEmpty() }
+    }
 
     data class RichText(
         override val id: PropertyId,
         val rich_text: List<RichTextBlock>,
-    ): Property
+    ): Property {
+        fun toPlainText(): String = rich_text.joinToString { it.plain_text.orEmpty() }
+    }
 
     data class Number(
         override val id: PropertyId,
