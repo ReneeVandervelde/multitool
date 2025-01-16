@@ -9,7 +9,8 @@ application {
 }
 
 dependencies {
-    implementation(projects.settings)
+    implementation(libs.bundles.cli)
     implementation(libs.spondee.units)
+    implementation(projects.settings)
     implementation(projects.notionApi)
 }
