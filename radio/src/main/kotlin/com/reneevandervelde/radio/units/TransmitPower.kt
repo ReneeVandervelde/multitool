@@ -4,7 +4,8 @@ package com.reneevandervelde.radio.units
 value class TransmitPower(
     val value: String,
 ) {
-    companion object {
+    companion object
+    {
         val Off = TransmitPower("Off")
         val Low = TransmitPower("Low")
         val Medium = TransmitPower("Medium")
@@ -12,7 +13,8 @@ value class TransmitPower(
         val Max = TransmitPower("Max")
     }
 
-    override fun toString(): String {
+    override fun toString(): String
+    {
         return value
     }
 }

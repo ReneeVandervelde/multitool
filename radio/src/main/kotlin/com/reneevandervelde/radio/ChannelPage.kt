@@ -3,10 +3,7 @@ package com.reneevandervelde.radio
 import com.reneevandervelde.notion.page.Page
 import com.reneevandervelde.notion.property.Property
 import com.reneevandervelde.notion.property.PropertyName
-import com.reneevandervelde.radio.units.Mode
-import com.reneevandervelde.radio.units.TransmitPower
-import com.reneevandervelde.radio.units.hertz
-import com.reneevandervelde.radio.units.megahertz
+import com.reneevandervelde.radio.units.*
 
 @JvmInline
 value class ChannelPage(
@@ -18,19 +15,19 @@ value class ChannelPage(
     val alias get() = page.getProperty<Property.RichText>(Properties.Alias)
         .toPlainText()
 
-    val frequency get() = page.getProperty<Property.Number>(Properties.RxFrequency)
+    val frequency: Frequency? get() = page.getProperty<Property.Number>(Properties.RxFrequency)
         .number
         ?.megahertz
 
-    val offset get()= page.getProperty<Property.Number>(Properties.Offset)
+    val offset: Frequency? get() = page.getProperty<Property.Number>(Properties.Offset)
         .number
         ?.megahertz
 
-    val rxCtcss get() = page.getProperty<Property.Number>(Properties.RxCtcss)
+    val rxCtcss: Frequency? get() = page.getProperty<Property.Number>(Properties.RxCtcss)
         .number
         ?.hertz
 
-    val txCtcss get() = page.getProperty<Property.Number>(Properties.TxCtcss)
+    val txCtcss: Frequency? get() = page.getProperty<Property.Number>(Properties.TxCtcss)
         .number
         ?.hertz
 
