@@ -10,5 +10,6 @@ application {
 
 dependencies {
     implementation(projects.settings)
+    implementation(libs.spondee.units)
     implementation(projects.notionApi)
 }

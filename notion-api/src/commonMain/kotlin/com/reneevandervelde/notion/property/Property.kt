@@ -17,6 +17,11 @@ sealed interface Property
         val multi_select: List<MultiSelectOption>,
     ): Property
 
+    data class Select(
+        override val id: PropertyId,
+        val select: SelectOption?
+    ): Property
+
     data class Title(
         override val id: PropertyId,
         val title: List<RichTextBlock>,
@@ -68,6 +73,10 @@ internal class PropertySerializer: KSerializer<Property>
                 id = surrogate.id,
                 number = surrogate.number
             )
+            PropertyType.Select -> Property.Select(
+                id = surrogate.id,
+                select = surrogate.select
+            )
             else -> Property.UnknownPropertyType(
                 id = surrogate.id,
                 type = surrogate.type,
@@ -80,6 +89,7 @@ internal class PropertySerializer: KSerializer<Property>
         val id: PropertyId,
         val type: PropertyType,
         val multi_select: List<MultiSelectOption>? = null,
+        val select: SelectOption? = null,
         val title: List<RichTextBlock>? = null,
         val rich_text: List<RichTextBlock>? = null,
         val number: Double? = null,

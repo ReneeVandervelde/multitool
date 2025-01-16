@@ -4,6 +4,8 @@ import com.reneevandervelde.notion.NotionModule
 import com.reneevandervelde.notion.database.DatabaseQuery
 import com.reneevandervelde.radio.settings.radioNotionSettings
 import com.reneevandervelde.settings.SettingsModule
+import inkapplications.spondee.structure.Mega
+import inkapplications.spondee.structure.format
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -21,7 +23,7 @@ fun main(args: Array<String>)
         result.results
             .map { ChannelPage(it) }
             .forEach {
-                println("${it.name} @ ${it.frequency}")
+                println("${it.name} -> ${it.mode} ${it.transmit} @ ${it.frequency?.format(Mega, decimals = 3)}")
             }
     }
 }
