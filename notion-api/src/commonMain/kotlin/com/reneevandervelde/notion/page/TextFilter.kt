@@ -22,7 +22,7 @@ sealed interface TextFilter
     ): TextFilter
 }
 
-private class TextFilterSerializer: KSerializer<TextFilter>
+internal class TextFilterSerializer: KSerializer<TextFilter>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 

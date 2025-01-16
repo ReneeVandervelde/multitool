@@ -39,7 +39,7 @@ sealed interface PageFilter
     ): PageFilter
 }
 
-private class PageFilterSerializer: KSerializer<PageFilter>
+internal class PageFilterSerializer: KSerializer<PageFilter>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 

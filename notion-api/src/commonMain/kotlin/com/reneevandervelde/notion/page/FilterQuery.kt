@@ -18,7 +18,7 @@ sealed interface FilterQuery
     ): FilterQuery
 }
 
-private class FilterQuerySerializer: KSerializer<FilterQuery>
+internal class FilterQuerySerializer: KSerializer<FilterQuery>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 

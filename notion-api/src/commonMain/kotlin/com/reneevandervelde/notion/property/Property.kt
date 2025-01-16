@@ -17,14 +17,28 @@ sealed interface Property
         val multi_select: List<MultiSelectOption>,
     ): Property
 
+    data class Select(
+        override val id: PropertyId,
+        val select: SelectOption?
+    ): Property
+
     data class Title(
         override val id: PropertyId,
         val title: List<RichTextBlock>,
-    ): Property
+    ): Property {
+        fun toPlainText(): String = title.joinToString { it.plain_text.orEmpty() }
+    }
 
     data class RichText(
         override val id: PropertyId,
         val rich_text: List<RichTextBlock>,
+    ): Property {
+        fun toPlainText(): String = rich_text.joinToString { it.plain_text.orEmpty() }
+    }
+
+    data class Number(
+        override val id: PropertyId,
+        val number: kotlin.Number?,
     ): Property
 
     data class UnknownPropertyType(
@@ -33,7 +47,7 @@ sealed interface Property
     ): Property
 }
 
-private class PropertySerializer: KSerializer<Property>
+internal class PropertySerializer: KSerializer<Property>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
@@ -55,6 +69,14 @@ private class PropertySerializer: KSerializer<Property>
                 id = surrogate.id,
                 rich_text = surrogate.rich_text ?: error("rich_text property must be present")
             )
+            PropertyType.Nunber -> Property.Number(
+                id = surrogate.id,
+                number = surrogate.number
+            )
+            PropertyType.Select -> Property.Select(
+                id = surrogate.id,
+                select = surrogate.select
+            )
             else -> Property.UnknownPropertyType(
                 id = surrogate.id,
                 type = surrogate.type,
@@ -67,7 +89,9 @@ private class PropertySerializer: KSerializer<Property>
         val id: PropertyId,
         val type: PropertyType,
         val multi_select: List<MultiSelectOption>? = null,
+        val select: SelectOption? = null,
         val title: List<RichTextBlock>? = null,
         val rich_text: List<RichTextBlock>? = null,
+        val number: Double? = null,
     )
 }
