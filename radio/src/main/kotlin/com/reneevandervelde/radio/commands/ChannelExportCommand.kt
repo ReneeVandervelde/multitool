@@ -24,7 +24,10 @@ object ChannelExportCommand: CliktCommand(
     {
         runBlocking {
             val settings = SettingsModule().settingsAccess.radioNotionSettings.first()
-                ?: return@runBlocking
+                ?: run {
+                    println("Radio settings not configured.")
+                    return@runBlocking
+                }
 
             val result = NotionModule().client.queryDatabase(
                 token = settings.apiToken,
