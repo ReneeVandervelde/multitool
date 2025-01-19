@@ -1,6 +1,6 @@
 plugins {
     application
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 application {
@@ -8,9 +8,13 @@ application {
     mainClass.set("com.reneevandervelde.radio.MainKt")
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation(libs.bundles.cli)
     implementation(libs.spondee.units)
-    implementation(projects.settings)
-    implementation(projects.notionApi)
+    implementation(libs.local.notion)
+    implementation(libs.local.settings)
 }

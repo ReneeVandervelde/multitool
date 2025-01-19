@@ -4,6 +4,17 @@ on:
         branches: [master]
 jobs:
     tests:
-        uses: inkapplications/.github/.github/workflows/kmp-checks.yml@1.2.0
-        with:
-            java-version: 23
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: Checkout
+                uses: actions/checkout@v4.2.2
+            -
+                name: Configure Java
+                uses: actions/setup-java@v4.5.0
+                with:
+                    java-version: 21
+                    distribution: temurin
+            -
+                name: Gradle Checks
+                run: bin/gradlew checkAll

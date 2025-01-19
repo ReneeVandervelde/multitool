@@ -1,6 +1,8 @@
 plugins {
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
 }
+
+apply(from = "../gradle/library.gradle.kts")
 
 kotlin {
     jvm()

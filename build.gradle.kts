@@ -1,9 +1,3 @@
-repositories {
-    mavenCentral()
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-    }
+tasks.register("checkAll") {
+    dependsOn(gradle.includedBuilds.map { it.task(":check") })
 }
