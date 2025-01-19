@@ -16,7 +16,6 @@ else
 fi
 
 echo "Installing into $INSTALL_DIR"
-exit 0
 
 echo "Installing Radio Module"
 gradlew radio:installDist || exit 1
