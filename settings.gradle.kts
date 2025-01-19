@@ -1,7 +1,5 @@
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 rootProject.name = "multitool"
 
-include("notion-api")
-include("radio")
-include("settings")
+includeBuild("notion-api")
+includeBuild("radio")
+includeBuild("settings")

@@ -1,7 +1,9 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
 }
+
+apply(from = "../gradle/library.gradle.kts")
 
 kotlin {
     jvm()
