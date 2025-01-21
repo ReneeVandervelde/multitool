@@ -19,11 +19,11 @@ repositories {
 }
 
 android {
-    namespace = "com.reneevandervelde.contacts"
+    namespace = project.group.toString()
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.inkapplications.glassconsole"
+        applicationId = project.group.toString()
         minSdk = 33
         targetSdk = 35
         versionCode = project.properties.getOrDefault("versionCode", "1").toString().toInt()
@@ -45,5 +45,8 @@ dependencies {
     implementation(libs.bundles.android)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.ink.ui.render.compose)
+    implementation(libs.regolith.data)
     implementation(libs.local.notion)
+    implementation(compose.runtime)
+    implementation(compose.foundation)
 }

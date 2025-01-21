@@ -6,6 +6,7 @@
 
     <application>
         <activity
+                android:label="Notion Contacts"
                 android:exported="true"
                 android:name=".ContactListActivity">
             <intent-filter>
