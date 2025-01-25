@@ -19,7 +19,7 @@ object ChirpFormat: ChannelExportFormat
             val offset = channel.offset
             mapOf(
                 "Location" to index.toString(),
-                "Name" to channel.alias,
+                "Name" to channel.alias.orEmpty(),
                 "Frequency" to channel.frequency
                     ?.toHertz()
                     ?.value(Mega)
