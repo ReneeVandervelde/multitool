@@ -2,7 +2,12 @@
 kotlin = "2.1.0"
 ktor = "3.0.3"
 coroutines = "1.10.1"
+ink-ui = "1.1.0"
+regolith = "1.6.0"
 
+##
+# Local Projects
+##
 [libraries.local-notion]
 version = "SNAPSHOT"
 module = "com.reneevandervelde:notion-api"
@@ -11,18 +16,40 @@ module = "com.reneevandervelde:notion-api"
 version = "SNAPSHOT"
 module = "com.reneevandervelde:settings"
 
+##
+# Gradle Plugins
+##
 [plugins.kotlin-multiplatform]
 version.ref = "kotlin"
 id = "org.jetbrains.kotlin.multiplatform"
+
+[plugins.kotlin-android]
+version.ref = "kotlin"
+id = "org.jetbrains.kotlin.android"
 
 [plugins.kotlin-jvm]
 version.ref = "kotlin"
 id = "org.jetbrains.kotlin.jvm"
 
+[plugins.kotlin-compose]
+version = "2.1.0"
+id = "org.jetbrains.kotlin.plugin.compose"
+
 [plugins.kotlin-serialization]
 version.ref = "kotlin"
 id = "org.jetbrains.kotlin.plugin.serialization"
 
+[plugins.android-application]
+version = "8.8.0-alpha05"
+id = "com.android.application"
+
+[plugins.jetbrains-compose]
+version = "1.7.3"
+id = "org.jetbrains.compose"
+
+##
+# Kotlin Libraries
+##
 [libraries.kotlin-gradle]
 version.ref = "kotlin"
 module = "org.jetbrains.kotlin:kotlin-gradle-plugin"
@@ -35,6 +62,13 @@ module = "org.jetbrains.kotlinx:kotlinx-coroutines-core"
 version.ref = "kotlin"
 module = "org.jetbrains.kotlin:kotlin-serialization"
 
+[libraries.kotlin-datetime]
+version = "0.6.1"
+module = "org.jetbrains.kotlinx:kotlinx-datetime"
+
+##
+# Ktor Libraries
+##
 [libraries.ktor-client-core]
 version.ref = "ktor"
 module="io.ktor:ktor-client-core"
@@ -55,10 +89,35 @@ module = "io.ktor:ktor-serialization-kotlinx-json"
 version.ref = "ktor"
 module="io.ktor:ktor-client-cio"
 
+##
+# Ink Libraries
+##
+[libraries.regolith-data]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:data"
+
+[libraries.regolith-processes]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:processes"
+
 [libraries.spondee-units]
 version = "1.5.0"
 module = "com.inkapplications.spondee:units"
 
+[libraries.ink-ui-render-compose]
+version.ref = "ink-ui"
+module = "com.inkapplications.ui:render-compose-android"
+
+##
+# Android
+##
+[libraries.androidx-activity-compose]
+version = "1.9.3"
+module = "androidx.activity:activity-compose"
+
+##
+# Other Libraries
+##
 [libraries.slf4j-shutthefuckup]
 version = "2.0.13"
 module = "org.slf4j:slf4j-nop"
@@ -67,10 +126,16 @@ module = "org.slf4j:slf4j-nop"
 version = "5.0.2"
 module = "com.github.ajalt.clikt:clikt"
 
+##
+# Bundles
+##
 [bundles]
 cli = [
     "slf4j-shutthefuckup",
     "clikt",
+]
+android = [
+    "androidx-activity-compose",
 ]
 ktor-client = [
     "ktor-client-core",

@@ -6,3 +6,6 @@ build
 
 # Ignore kotlin compiler files
 .kotlin/
+
+# Ignore local config
+local.properties

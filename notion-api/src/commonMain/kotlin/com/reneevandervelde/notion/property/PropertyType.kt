@@ -12,6 +12,10 @@ value class PropertyType(val value: String)
         val Select = PropertyType("select")
         val Title = PropertyType("title")
         val RichText = PropertyType("rich_text")
-        val Nunber = PropertyType("number")
+        val Number = PropertyType("number")
+        val PhoneNumber = PropertyType("phone_number")
+        val Email = PropertyType("email")
+        val Date = PropertyType("date")
+        val UniqueId = PropertyType("unique_id")
     }
 }
