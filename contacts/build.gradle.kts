@@ -29,6 +29,11 @@ android {
         versionCode = project.properties.getOrDefault("versionCode", "1").toString().toInt()
         versionName = project.properties.getOrDefault("versionName", "SNAPSHOT").toString()
     }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
     buildFeatures {
         compose = true
     }
