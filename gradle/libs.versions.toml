@@ -62,6 +62,10 @@ module = "org.jetbrains.kotlinx:kotlinx-coroutines-core"
 version.ref = "kotlin"
 module = "org.jetbrains.kotlin:kotlin-serialization"
 
+[libraries.kotlin-datetime]
+version = "0.6.1"
+module = "org.jetbrains.kotlinx:kotlinx-datetime"
+
 ##
 # Ktor Libraries
 ##
@@ -91,6 +95,10 @@ module="io.ktor:ktor-client-cio"
 [libraries.regolith-data]
 version.ref = "regolith"
 module = "com.inkapplications.regolith:data"
+
+[libraries.regolith-processes]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:processes"
 
 [libraries.spondee-units]
 version = "1.5.0"

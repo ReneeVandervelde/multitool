@@ -11,6 +11,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.bundles.ktor.client)
+            api(libs.kotlin.datetime)
         }
     }
 }

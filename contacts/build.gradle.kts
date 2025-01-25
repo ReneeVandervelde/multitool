@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.ink.ui.render.compose)
     implementation(libs.regolith.data)
+    implementation(libs.regolith.processes)
     implementation(libs.local.notion)
     implementation(compose.runtime)
     implementation(compose.foundation)

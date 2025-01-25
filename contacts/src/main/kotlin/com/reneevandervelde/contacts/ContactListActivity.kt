@@ -25,6 +25,8 @@ class ContactListActivity: ComponentActivity()
 
         val module = ContactsModule(application)
 
+        module.initRunner.initialize()
+
         setContent {
             val settingsRows = module.appSettings
                 .map { setting ->

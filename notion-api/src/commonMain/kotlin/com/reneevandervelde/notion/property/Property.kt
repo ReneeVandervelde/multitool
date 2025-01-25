@@ -1,5 +1,6 @@
 package com.reneevandervelde.notion.property
 
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -31,9 +32,16 @@ sealed interface Property
 
     data class RichText(
         override val id: PropertyId,
-        val rich_text: List<RichTextBlock>,
+        val rich_text: List<RichTextBlock>?,
     ): Property {
-        fun toPlainText(): String = rich_text.joinToString { it.plain_text.orEmpty() }
+        fun toPlainText(): String? = rich_text?.joinToString { it.plain_text.orEmpty() }
+    }
+
+    data class Date(
+        override val id: PropertyId,
+        val start: String?,
+    ): Property {
+        fun toLocalDate() = start?.let(LocalDate::parse)
     }
 
     data class Number(
@@ -41,9 +49,25 @@ sealed interface Property
         val number: kotlin.Number?,
     ): Property
 
+    data class PhoneNumber(
+        override val id: PropertyId,
+        val number: String?,
+    ): Property
+
+    data class Email(
+        override val id: PropertyId,
+        val email: String?,
+    ): Property
+
     data class UnknownPropertyType(
         override val id: PropertyId,
         val type: PropertyType,
+    ): Property
+
+    data class UniqueId(
+        override val id: PropertyId,
+        val number: Int,
+        val prefix: String? = null,
     ): Property
 }
 
@@ -69,13 +93,30 @@ internal class PropertySerializer: KSerializer<Property>
                 id = surrogate.id,
                 rich_text = surrogate.rich_text ?: error("rich_text property must be present")
             )
-            PropertyType.Nunber -> Property.Number(
+            PropertyType.Number -> Property.Number(
                 id = surrogate.id,
                 number = surrogate.number
             )
             PropertyType.Select -> Property.Select(
                 id = surrogate.id,
                 select = surrogate.select
+            )
+            PropertyType.PhoneNumber -> Property.PhoneNumber(
+                id = surrogate.id,
+                number = surrogate.phone_number
+            )
+            PropertyType.Email -> Property.Email(
+                id = surrogate.id,
+                email = surrogate.email
+            )
+            PropertyType.Date -> Property.Date(
+                id = surrogate.id,
+                start = surrogate.date?.start
+            )
+            PropertyType.UniqueId -> Property.UniqueId(
+                id = surrogate.id,
+                number = surrogate.unique_id?.number ?: error("unique ID object must be present"),
+                prefix = surrogate.unique_id.prefix
             )
             else -> Property.UnknownPropertyType(
                 id = surrogate.id,
@@ -93,5 +134,9 @@ internal class PropertySerializer: KSerializer<Property>
         val title: List<RichTextBlock>? = null,
         val rich_text: List<RichTextBlock>? = null,
         val number: Double? = null,
+        val phone_number: String? = null,
+        val email: String? = null,
+        val date: Date? = null,
+        val unique_id: UniqueId? = null,
     )
 }

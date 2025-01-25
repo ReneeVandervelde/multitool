@@ -11,6 +11,7 @@ data class Page(
     val parent: Parent,
     val properties: Map<PropertyName, Property>,
     val icon: PageIcon? = null,
+    val url: String,
 ) {
     inline fun <reified T: Property> getProperty(name: PropertyName): T {
         return properties[name] as T
