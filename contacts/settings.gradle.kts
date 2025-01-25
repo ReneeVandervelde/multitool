@@ -1,4 +1,4 @@
-rootProject.name = "radio"
+rootProject.name = "contacts"
 
 apply(from = "../gradle/sharedCatalogs.gradle.kts")
 
