@@ -41,6 +41,13 @@ value class ChannelPage(
         ?.name
         ?.let(::Mode)
 
+    val valid get() = page.getProperty<Property.BooleanFormula>(Properties.Valid)
+        .value
+
+    val tags get() = page.getProperty<Property.MultiSelect>(Properties.Tags)
+        .multi_select
+        .map { it.name }
+
     object Properties
     {
         val Name = PropertyName("Name")
@@ -51,5 +58,7 @@ value class ChannelPage(
         val TxCtcss = PropertyName("Tx CTCSS")
         val Transmit = PropertyName("Transmit")
         val Mode = PropertyName("Mode")
+        val Valid = PropertyName("Valid")
+        val Tags = PropertyName("Tags")
     }
 }
