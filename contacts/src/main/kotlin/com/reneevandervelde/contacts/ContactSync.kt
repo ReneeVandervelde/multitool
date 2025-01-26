@@ -3,10 +3,9 @@ package com.reneevandervelde.contacts
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
-import android.net.Uri
 import android.provider.ContactsContract
 import com.reneevandervelde.contacts.settings.NotionSettings
-import com.reneevandervelde.notion.NotionApi
+import com.reneevandervelde.notion.*
 import com.reneevandervelde.notion.database.DatabaseQuery
 import kotlinx.coroutines.flow.*
 import regolith.data.settings.SettingsAccess
@@ -31,13 +30,13 @@ class ContactSync(
         apiKeySetting,
         databaseIdSetting,
     ) { apiKey, databaseId ->
-        notion.queryDatabase(
+        notion.queryDatabaseForAll(
             token = apiKey,
             database = databaseId,
             query = DatabaseQuery(),
         )
     }.map {
-        it.results.map {
+        it.map {
             ContactPage(it)
         }.filter {
             it.hasDetails
