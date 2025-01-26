@@ -69,6 +69,11 @@ sealed interface Property
         val number: Int,
         val prefix: String? = null,
     ): Property
+
+    data class BooleanFormula(
+        override val id: PropertyId,
+        val value: Boolean,
+    ): Property
 }
 
 internal class PropertySerializer: KSerializer<Property>
@@ -118,6 +123,16 @@ internal class PropertySerializer: KSerializer<Property>
                 number = surrogate.unique_id?.number ?: error("unique ID object must be present"),
                 prefix = surrogate.unique_id.prefix
             )
+            PropertyType.Formula -> when (surrogate.formula?.type) {
+                Surrogate.FormulaType.Boolean -> Property.BooleanFormula(
+                    id = surrogate.id,
+                    value = surrogate.formula.boolean ?: error("boolean formula must be present")
+                )
+                else -> Property.UnknownPropertyType(
+                    id = surrogate.id,
+                    type = surrogate.type,
+                )
+            }
             else -> Property.UnknownPropertyType(
                 id = surrogate.id,
                 type = surrogate.type,
@@ -138,5 +153,23 @@ internal class PropertySerializer: KSerializer<Property>
         val email: String? = null,
         val date: Date? = null,
         val unique_id: UniqueId? = null,
-    )
+        val formula: FormulaSurrogate? = null,
+    ) {
+        @Serializable
+        @JvmInline
+        value class FormulaType(val value: String) {
+            companion object {
+                val Number = FormulaType("number")
+                val String = FormulaType("string")
+                val Boolean = FormulaType("boolean")
+            }
+        }
+        @Serializable
+        data class FormulaSurrogate(
+            val type: FormulaType,
+            val number: Double? = null,
+            val string: String? = null,
+            val boolean: Boolean? = null,
+        )
+    }
 }

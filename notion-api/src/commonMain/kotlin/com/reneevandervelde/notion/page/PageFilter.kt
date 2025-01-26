@@ -45,6 +45,16 @@ sealed interface PageFilter
         val filter: ValueFilter,
     ): PageFilter
 
+    data class Checkbox(
+        val property: PropertyName,
+        val filter: CheckboxFilter,
+    ): PageFilter
+
+    data class CheckboxFormula(
+        val property: PropertyName,
+        val filter: CheckboxFilter,
+    ): PageFilter
+
     data class Or(
         val filters: List<PageFilter>,
     ): PageFilter {
@@ -95,6 +105,16 @@ internal class PageFilterSerializer: KSerializer<PageFilter>
                 property = value.property,
                 date = value.filter,
             )
+            is PageFilter.Checkbox -> Surrogate(
+                property = value.property,
+                checkbox = value.filter,
+            )
+            is PageFilter.CheckboxFormula -> Surrogate(
+                property = value.property,
+                formula = Surrogate.Formula(
+                    checkbox = value.filter,
+                ),
+            )
             is PageFilter.Or -> Surrogate(
                 or = value.filters,
             )
@@ -115,7 +135,14 @@ internal class PageFilterSerializer: KSerializer<PageFilter>
         val phone_number: ValueFilter? = null,
         val email: ValueFilter? = null,
         val date: ValueFilter? = null,
+        val checkbox: CheckboxFilter? = null,
+        val formula: Formula? = null,
         val or: List<PageFilter>? = null,
         val and: List<PageFilter>? = null,
-    )
+    ) {
+        @Serializable
+        data class Formula(
+            val checkbox: CheckboxFilter? = null,
+        )
+    }
 }

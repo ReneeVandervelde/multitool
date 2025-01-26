@@ -6,6 +6,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.reneevandervelde.notion.NotionModule
 import com.reneevandervelde.notion.database.DatabaseQuery
+import com.reneevandervelde.notion.page.CheckboxFilter
+import com.reneevandervelde.notion.page.PageFilter
+import com.reneevandervelde.notion.queryDatabaseForAll
 import com.reneevandervelde.radio.ChannelPage
 import com.reneevandervelde.radio.formats.ChirpFormat
 import com.reneevandervelde.radio.settings.radioNotionSettings
@@ -29,14 +32,21 @@ object ChannelExportCommand: CliktCommand(
                     return@runBlocking
                 }
 
-            val result = NotionModule().client.queryDatabase(
+            val results = NotionModule().client.queryDatabaseForAll(
                 token = settings.apiToken,
                 database = settings.databaseId,
-                query = DatabaseQuery()
+                query = DatabaseQuery(
+                    filter = PageFilter.And(
+                        PageFilter.CheckboxFormula(
+                            property = ChannelPage.Properties.Valid,
+                            filter = CheckboxFilter.Equals(true),
+                        ),
+                    ),
+                )
             )
 
             val csvFields = ChirpFormat.fields(
-                channels = result.results.map { ChannelPage(it) }
+                channels = results.map { ChannelPage(it) }
             )
 
             val headerRow = csvFields.flatMap { it.keys }

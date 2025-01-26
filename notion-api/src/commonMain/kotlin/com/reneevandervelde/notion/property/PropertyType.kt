@@ -17,5 +17,6 @@ value class PropertyType(val value: String)
         val Email = PropertyType("email")
         val Date = PropertyType("date")
         val UniqueId = PropertyType("unique_id")
+        val Formula = PropertyType("formula")
     }
 }

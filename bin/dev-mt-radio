@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+gradlew radio:installDist --quiet || exit 1
+"radio/build/install/mt-radio/bin/mt-radio" "$@" || exit $?
