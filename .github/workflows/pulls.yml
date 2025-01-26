@@ -13,5 +13,5 @@ jobs:
                     java-version: 21
                     distribution: temurin
             -
-                name: Gradle Checks
-                run: bin/gradlew checkAll
+                name: Checks
+                run: bin/check checkAll
