@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
 INSTALL_DIR="$1"
 shift
 
@@ -18,8 +19,8 @@ fi
 echo "Installing into $INSTALL_DIR"
 
 echo "Installing Radio Module"
-gradlew radio:installDist || exit 1
-cp -rv radio/build/install/mt-radio "$INSTALL_DIR/" || exit 1
+"$PROJECT_DIR/bin/gradlew" radio:installDist || exit 1
+cp -rv "$PROJECT_DIR/radio/build/install/mt-radio" "$INSTALL_DIR/" || exit 1
 
 echo ""
 echo "Successfully installed"
