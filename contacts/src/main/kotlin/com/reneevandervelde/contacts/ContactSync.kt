@@ -7,6 +7,9 @@ import android.provider.ContactsContract
 import com.reneevandervelde.contacts.settings.NotionSettings
 import com.reneevandervelde.notion.*
 import com.reneevandervelde.notion.database.DatabaseQuery
+import com.reneevandervelde.notion.page.PageFilter
+import com.reneevandervelde.notion.page.TextFilter
+import com.reneevandervelde.notion.page.ValueFilter
 import kotlinx.coroutines.flow.*
 import regolith.data.settings.SettingsAccess
 import regolith.data.settings.observeSetting
@@ -33,13 +36,36 @@ class ContactSync(
         notion.queryDatabaseForAll(
             token = apiKey,
             database = databaseId,
-            query = DatabaseQuery(),
+            query = DatabaseQuery(
+                filter = PageFilter.And(
+                    PageFilter.Or(
+                        PageFilter.PhoneNumber(
+                            property = ContactPage.Properties.Phone,
+                            filter = ValueFilter.IsNotEmpty,
+                        ),
+                        PageFilter.Email(
+                            property = ContactPage.Properties.Email,
+                            filter = ValueFilter.IsNotEmpty,
+                        ),
+                        PageFilter.Email(
+                            property = ContactPage.Properties.WorkEmail,
+                            filter = ValueFilter.IsNotEmpty,
+                        ),
+                        PageFilter.Text(
+                            property = ContactPage.Properties.Address,
+                            filter = TextFilter.IsNotEmpty,
+                        ),
+                    ),
+                    PageFilter.Text(
+                        property = ContactPage.Properties.Name,
+                        filter = TextFilter.IsNotEmpty,
+                    )
+                )
+            ),
         )
     }.map {
         it.map {
             ContactPage(it)
-        }.filter {
-            it.hasDetails
         }
     }
 
