@@ -7,31 +7,41 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable(with = FilterQuerySerializer::class)
-sealed interface FilterQuery
+sealed interface ValueFilter
 {
     data class Contains(
         val contains: String,
-    ): FilterQuery
+    ): ValueFilter
 
     data class DoesNotEqual(
         val value: String,
-    ): FilterQuery
+    ): ValueFilter
+
+    data object IsEmpty: ValueFilter
+
+    data object IsNotEmpty: ValueFilter
 }
 
-internal class FilterQuerySerializer: KSerializer<FilterQuery>
+internal class FilterQuerySerializer: KSerializer<ValueFilter>
 {
     override val descriptor: SerialDescriptor = Surrogate.serializer().descriptor
 
-    override fun deserialize(decoder: Decoder): FilterQuery = TODO("Not yet implemented")
+    override fun deserialize(decoder: Decoder): ValueFilter = TODO("Not yet implemented")
 
-    override fun serialize(encoder: Encoder, value: FilterQuery)
+    override fun serialize(encoder: Encoder, value: ValueFilter)
     {
         val surrogate = when (value) {
-            is FilterQuery.Contains -> Surrogate(
+            is ValueFilter.Contains -> Surrogate(
                 contains = value.contains,
             )
-            is FilterQuery.DoesNotEqual -> Surrogate(
+            is ValueFilter.DoesNotEqual -> Surrogate(
                 does_not_equal = value.value,
+            )
+            ValueFilter.IsEmpty -> Surrogate(
+                is_empty = true,
+            )
+            ValueFilter.IsNotEmpty -> Surrogate(
+                is_not_empty = true,
             )
         }
         Surrogate.serializer().serialize(encoder, surrogate)
@@ -41,5 +51,7 @@ internal class FilterQuerySerializer: KSerializer<FilterQuery>
     private data class Surrogate(
         val contains: String? = null,
         val does_not_equal: String? = null,
+        val is_empty: Boolean? = null,
+        val is_not_empty: Boolean? = null,
     )
 }

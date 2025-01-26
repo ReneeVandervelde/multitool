@@ -29,11 +29,6 @@ value class ContactPage(val page: Page)
             else it.format(LocalDate.Formats.ISO)
         }
 
-    val hasDetails get() = !phone.isNullOrBlank()
-        || !email.isNullOrBlank()
-        || !workEmail.isNullOrBlank()
-        || !address.isNullOrBlank()
-
     object Properties
     {
         val Id = PropertyName("ID")

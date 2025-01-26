@@ -12,17 +12,17 @@ sealed interface PageFilter
 {
     data class Select(
         val property: PropertyName,
-        val filter: FilterQuery,
+        val filter: ValueFilter,
     ): PageFilter
 
     data class Status(
         val property: PropertyName,
-        val filter: FilterQuery,
+        val filter: ValueFilter,
     ): PageFilter
 
     data class MultiSelect(
         val property: PropertyName,
-        val filter: FilterQuery,
+        val filter: ValueFilter,
     ): PageFilter
 
     data class Text(
@@ -30,13 +30,32 @@ sealed interface PageFilter
         val filter: TextFilter? = null,
     ): PageFilter
 
+    data class Date(
+        val property: PropertyName,
+        val filter: ValueFilter,
+    ): PageFilter
+
+    data class Email(
+        val property: PropertyName,
+        val filter: ValueFilter,
+    ): PageFilter
+
+    data class PhoneNumber(
+        val property: PropertyName,
+        val filter: ValueFilter,
+    ): PageFilter
+
     data class Or(
         val filters: List<PageFilter>,
-    ): PageFilter
+    ): PageFilter {
+        constructor(vararg filters: PageFilter): this(filters.toList())
+    }
 
     data class And(
         val filters: List<PageFilter>,
-    ): PageFilter
+    ): PageFilter {
+        constructor(vararg filters: PageFilter): this(filters.toList())
+    }
 }
 
 internal class PageFilterSerializer: KSerializer<PageFilter>
@@ -64,6 +83,18 @@ internal class PageFilterSerializer: KSerializer<PageFilter>
                 property = value.property,
                 rich_text = value.filter,
             )
+            is PageFilter.PhoneNumber -> Surrogate(
+                property = value.property,
+                phone_number = value.filter,
+            )
+            is PageFilter.Email -> Surrogate(
+                property = value.property,
+                email = value.filter,
+            )
+            is PageFilter.Date -> Surrogate(
+                property = value.property,
+                date = value.filter,
+            )
             is PageFilter.Or -> Surrogate(
                 or = value.filters,
             )
@@ -77,10 +108,13 @@ internal class PageFilterSerializer: KSerializer<PageFilter>
     @Serializable
     private data class Surrogate(
         val property: PropertyName? = null,
-        val multi_select: FilterQuery? = null,
-        val select: FilterQuery? = null,
-        val status: FilterQuery? = null,
+        val multi_select: ValueFilter? = null,
+        val select: ValueFilter? = null,
+        val status: ValueFilter? = null,
         val rich_text: TextFilter? = null,
+        val phone_number: ValueFilter? = null,
+        val email: ValueFilter? = null,
+        val date: ValueFilter? = null,
         val or: List<PageFilter>? = null,
         val and: List<PageFilter>? = null,
     )
