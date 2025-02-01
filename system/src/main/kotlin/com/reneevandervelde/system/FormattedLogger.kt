@@ -3,16 +3,14 @@ package com.reneevandervelde.system
 import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.rendering.TextStyles.*
 import com.github.ajalt.mordant.terminal.Terminal
+import com.inkapplications.datetime.ZonedClock
 import kimchi.logger.LogLevel
 import kimchi.logger.LogWriter
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class FormattedLogger(
     private val terminal: Terminal,
     private val isVerbose: Boolean,
-    private val clock: Clock,
+    private val clock: ZonedClock,
 ): LogWriter {
     override fun shouldLog(level: LogLevel, cause: Throwable?): Boolean
     {
@@ -22,7 +20,7 @@ class FormattedLogger(
     override fun log(level: LogLevel, message: String, cause: Throwable?)
     {
         val time = if (isVerbose) {
-            clock.now().toLocalDateTime(TimeZone.UTC).let {
+            clock.localDateTime().let {
                 "[$it] "
             }
         } else ""

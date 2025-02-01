@@ -3,6 +3,7 @@ package com.reneevandervelde.system.commands
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
+import com.inkapplications.standard.throwCancels
 import com.reneevandervelde.system.SystemSettings
 import com.reneevandervelde.system.processes.git.GitCommands
 import com.reneevandervelde.system.processes.printAndRequireSuccess
@@ -44,7 +45,7 @@ object UpdateCommand: SystemCommand()
             ).printAndRequireSuccess()
 
             terminal.prompt("Confirm repository signatures (Y/n)")
-        }
+        }.throwCancels()
 
         if (confirmation.getOrNull() != "Y") {
             module.logger.error("Signature confirmation failed. Deleting Repository.")

@@ -14,7 +14,6 @@ repositories {
 
 dependencies {
     implementation(libs.bundles.cli)
-    implementation(libs.kimchi.core)
-    implementation(libs.kotlin.datetime)
+    implementation(libs.bundles.kotlin.extensions)
     implementation(libs.local.settings)
 }

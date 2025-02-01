@@ -4,6 +4,7 @@ ktor = "3.0.3"
 coroutines = "1.10.1"
 ink-ui = "1.1.0"
 regolith = "1.6.0"
+watermelon = "1.8.1"
 
 ##
 # Local Projects
@@ -104,6 +105,18 @@ module = "com.inkapplications.regolith:processes"
 version = "1.5.0"
 module = "com.inkapplications.spondee:units"
 
+[libraries.watermelon-standard]
+version.ref = "watermelon"
+module = "com.inkapplications.watermelon:standard"
+
+[libraries.watermelon-coroutines]
+version.ref = "watermelon"
+module = "com.inkapplications.watermelon:coroutines"
+
+[libraries.watermelon-datetime]
+version.ref = "watermelon"
+module = "com.inkapplications.watermelon:datetime"
+
 [libraries.ink-ui-render-compose]
 version.ref = "ink-ui"
 module = "com.inkapplications.ui:render-compose-android"
@@ -147,4 +160,12 @@ ktor-client = [
     "ktor-client-contentnegotiation",
     "ktor-serialization-json",
     "ktor-client-cio",
+]
+kotlin-extensions = [
+    "kotlin-coroutines-core",
+    "kotlin-datetime",
+    "watermelon-standard",
+    "watermelon-coroutines",
+    "watermelon-datetime",
+    "kimchi-core",
 ]
