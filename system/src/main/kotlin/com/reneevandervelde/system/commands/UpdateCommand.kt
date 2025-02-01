@@ -1,29 +1,31 @@
 package com.reneevandervelde.system.commands
 
-import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
 import com.reneevandervelde.system.SystemModule
 import com.reneevandervelde.system.SystemSettings
-import com.reneevandervelde.system.processes.*
 import com.reneevandervelde.system.processes.git.GitCommands
+import com.reneevandervelde.system.processes.printAndRequireSuccess
 import com.reneevandervelde.system.systemSettings
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
-object UpdateCommand: CliktCommand()
+object UpdateCommand: SystemCommand()
 {
-    override fun run()
+    override fun help(context: Context): String
     {
-        runBlocking {
-            println("Updating system...")
-            val settings = SystemModule.settings.systemSettings.first()
-            settings.createDirs()
+        return "Update software packages managed by multitool"
+    }
 
-            if (!settings.buildGitDir.exists()) {
-                cloneBuildRepository(settings)
-            }
+    override suspend fun runCommand()
+    {
+        println("Updating system...")
+        val settings = SystemModule.settings.systemSettings.first()
+        settings.createDirs()
+
+        if (!settings.buildGitDir.exists()) {
+            cloneBuildRepository(settings)
         }
     }
 
