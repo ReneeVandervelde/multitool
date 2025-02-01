@@ -108,6 +108,10 @@ module = "com.inkapplications.spondee:units"
 version.ref = "ink-ui"
 module = "com.inkapplications.ui:render-compose-android"
 
+[libraries.kimchi-core]
+version = "2.2.0"
+module = "com.inkapplications.kimchi:core"
+
 ##
 # Android
 ##

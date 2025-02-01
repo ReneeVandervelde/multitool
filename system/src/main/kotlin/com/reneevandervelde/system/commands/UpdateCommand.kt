@@ -3,7 +3,6 @@ package com.reneevandervelde.system.commands
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
-import com.reneevandervelde.system.SystemModule
 import com.reneevandervelde.system.SystemSettings
 import com.reneevandervelde.system.processes.git.GitCommands
 import com.reneevandervelde.system.processes.printAndRequireSuccess
@@ -20,8 +19,8 @@ object UpdateCommand: SystemCommand()
 
     override suspend fun runCommand()
     {
-        println("Updating system...")
-        val settings = SystemModule.settings.systemSettings.first()
+        module.logger.info("Updating system...")
+        val settings = module.settings.systemSettings.first()
         settings.createDirs()
 
         if (!settings.buildGitDir.exists()) {
@@ -31,7 +30,7 @@ object UpdateCommand: SystemCommand()
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)
     {
-        println("Cloning repo for build")
+        module.logger.info("Cloning repo for build")
         val confirmation = runCatching {
             GitCommands.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
                 .printAndRequireSuccess()
@@ -48,6 +47,7 @@ object UpdateCommand: SystemCommand()
         }
 
         if (confirmation.getOrNull() != "Y") {
+            module.logger.error("Signature confirmation failed. Deleting Repository.")
             settings.buildDir.deleteRecursively()
             exitProcess(1)
         }
