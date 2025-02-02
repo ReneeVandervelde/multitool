@@ -5,8 +5,9 @@ import com.reneevandervelde.system.processes.exec
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
-class GitCommands(val repositoryPath: File)
-{
+class GitCommands(
+    private val repositoryPath: File
+) {
     fun status(): Flow<ProcessState>
     {
         return exec("git", "status", workingDir = repositoryPath)

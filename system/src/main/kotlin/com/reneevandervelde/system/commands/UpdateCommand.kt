@@ -3,16 +3,23 @@ package com.reneevandervelde.system.commands
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
-import com.inkapplications.standard.throwCancels
 import com.reneevandervelde.system.SystemSettings
+import com.reneevandervelde.system.exceptions.DocumentedResult
+import com.reneevandervelde.system.processes.ExitCode
 import com.reneevandervelde.system.processes.git.GitCommands
-import com.reneevandervelde.system.processes.printAndRequireSuccess
+import com.reneevandervelde.system.processes.awaitSuccess
+import com.reneevandervelde.system.processes.fenceOutput
 import com.reneevandervelde.system.systemSettings
 import kotlinx.coroutines.flow.first
-import kotlin.system.exitProcess
 
 object UpdateCommand: SystemCommand()
 {
+    private val SignatureConfirmationFailure = DocumentedResult(
+        meaning = "Signature confirmation failed",
+        exitCode = ExitCode(10),
+    )
+    override val errors: List<DocumentedResult> = listOf(SignatureConfirmationFailure)
+
     override fun help(context: Context): String
     {
         return "Update software packages managed by multitool"
@@ -20,7 +27,7 @@ object UpdateCommand: SystemCommand()
 
     override suspend fun runCommand()
     {
-        module.logger.info("Updating system...")
+        logger.info("Updating system...")
         val settings = module.settings.systemSettings.first()
         settings.createDirs()
 
@@ -31,26 +38,25 @@ object UpdateCommand: SystemCommand()
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)
     {
-        module.logger.info("Cloning repo for build")
-        val confirmation = runCatching {
-            GitCommands.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
-                .printAndRequireSuccess()
-            val buildRepository = GitCommands(settings.buildDir)
+        logger.info("Cloning repo for build")
+        GitCommands.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
+            .fenceOutput(logger)
+            .awaitSuccess()
+        val buildRepository = GitCommands(settings.buildDir)
 
-            buildRepository.status().printAndRequireSuccess()
-            buildRepository.log(
-                count = 8,
-                showSignature = true,
-                format = "Commit: %H%nDate: %ai%n",
-            ).printAndRequireSuccess()
+        buildRepository.status().fenceOutput(logger).awaitSuccess()
+        buildRepository.log(
+            count = 8,
+            showSignature = true,
+            format = "Commit: %H%nDate: %ai%n",
+        ).fenceOutput(logger).awaitSuccess()
 
-            terminal.prompt("Confirm repository signatures (Y/n)")
-        }.throwCancels()
+        val confirmation = terminal.prompt("Confirm repository signatures (Y/n)")
 
-        if (confirmation.getOrNull() != "Y") {
-            module.logger.error("Signature confirmation failed. Deleting Repository.")
+        if (confirmation != "Y") {
+            logger.info("Confirmation rejected by input. Deleting Repository.")
             settings.buildDir.deleteRecursively()
-            exitProcess(1)
+            SignatureConfirmationFailure.throwError()
         }
     }
 }

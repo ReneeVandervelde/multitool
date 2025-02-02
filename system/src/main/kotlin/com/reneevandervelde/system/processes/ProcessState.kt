@@ -1,29 +1,34 @@
 package com.reneevandervelde.system.processes
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.merge
+import com.reneevandervelde.system.FormattedLogger
+import kotlinx.coroutines.flow.*
 import java.io.File
 import kotlin.streams.asSequence
-import kotlin.system.exitProcess
 
 /**
  * Result from an [exec] command.
  */
 sealed interface ProcessState
 {
+    val commandString: String
+
+    data class Prepared(
+        override val commandString: String,
+    ): ProcessState
+
     sealed interface Started: ProcessState
-    {
-        val standardOutput: Flow<String>
-        val errorOutput: Flow<String>
-        val output: Flow<String> get() = merge(standardOutput, errorOutput)
-    }
 
     data class Running(
-        override val standardOutput: Flow<String>,
-        override val errorOutput: Flow<String>,
+        override val commandString: String,
     ): Started
+
+    data class Capturing(
+        override val commandString: String,
+        val standardOutput: Flow<String>,
+        val errorOutput: Flow<String>,
+    ): Started {
+        val output: Flow<String> get() = merge(standardOutput, errorOutput)
+    }
 
     /**
      * Results that ran the command successfully.
@@ -32,25 +37,24 @@ sealed interface ProcessState
      */
     sealed interface Completed: Started
     {
-        val exitCode: Int
+        val exitCode: ExitCode
     }
 
     /**
      * Nominal return code from the executed command.
      */
     data class Success(
-        override val exitCode: Int,
-        override val standardOutput: Flow<String>,
-        override val errorOutput: Flow<String>,
-    ): Completed
+        override val commandString: String,
+    ): Completed {
+        override val exitCode: ExitCode = ExitCode.Success
+    }
 
     /**
      * Result when the command was run, but exited with an unsuccesful code.
      */
     data class Failure(
-        override val exitCode: Int,
-        override val standardOutput: Flow<String>,
-        override val errorOutput: Flow<String>,
+        override val commandString: String,
+        override val exitCode: ExitCode,
     ): Completed
 
     /**
@@ -60,6 +64,7 @@ sealed interface ProcessState
      * of 127.
      */
     data class Error(
+        override val commandString: String,
         val error: Throwable,
     ): ProcessState
 }
@@ -70,16 +75,19 @@ sealed interface ProcessState
 fun exec(
     vararg command: String,
     workingDir: File? = null,
+    capture: Boolean = false,
 ): Flow<ProcessState> {
     return flow {
+        val builder = ProcessBuilder(*command)
+            .apply { if (!capture) inheritIO() }
+            .apply { if (workingDir != null) directory(workingDir) }
+        val commandString = builder.command().joinToString(" ")
+        emit(ProcessState.Prepared(commandString))
         val processResult = runCatching {
-            ProcessBuilder(*command)
-                .inheritIO()
-                .apply { if (workingDir != null) directory(workingDir) }
-                .start()
+            builder.start()
         }
         processResult.onFailure {
-            emit(ProcessState.Error(it))
+            emit(ProcessState.Error(commandString, it))
         }
         processResult.onSuccess { process ->
             val standardOutput = process.inputStream.bufferedReader()
@@ -90,7 +98,8 @@ fun exec(
                 .lines()
                 .asSequence()
                 .asFlow()
-            emit(ProcessState.Running(
+            emit(ProcessState.Capturing(
+                commandString = commandString,
                 standardOutput = standardOutput,
                 errorOutput = errorOutput,
             ))
@@ -98,35 +107,65 @@ fun exec(
             val exit = process.exitValue()
             if (exit == 0) {
                 emit(ProcessState.Success(
-                    exitCode = exit,
-                    standardOutput = standardOutput,
-                    errorOutput = errorOutput,
+                    commandString = commandString,
                 ))
             } else {
                 emit(ProcessState.Failure(
-                    exitCode = exit,
-                    standardOutput = standardOutput,
-                    errorOutput = errorOutput,
+                    commandString = commandString,
+                    exitCode = ExitCode(exit),
                 ))
             }
         }
     }
 }
 
-suspend fun Flow<ProcessState>.printAndRequireSuccess()
+fun Flow<ProcessState>.printCapturedLines(): Flow<ProcessState>
 {
-    collect { state ->
+    return onEach { state ->
         when (state) {
-            is ProcessState.Running -> {
+            is ProcessState.Capturing -> {
                 state.output.collect { println(it) }
             }
-            is ProcessState.Error -> {
-                throw state.error
-            }
-            is ProcessState.Failure -> {
-                exitProcess(state.exitCode)
-            }
-            is ProcessState.Success -> {}
+            else -> {}
         }
     }
+}
+
+fun Flow<ProcessState>.fenceOutput(logger: FormattedLogger): Flow<ProcessState>
+{
+    return onEach { state ->
+        when (state) {
+            is ProcessState.Prepared -> {
+                logger.blank()
+                logger.info("exec: ${state.commandString}")
+                logger.divider()
+            }
+            is ProcessState.Completed -> {
+                logger.divider()
+                logger.info("exit: ${state.exitCode}")
+                logger.blank()
+
+            }
+            is ProcessState.Error -> {
+                logger.divider()
+            }
+            else -> {}
+        }
+    }
+}
+
+suspend fun Flow<ProcessState>.awaitSuccess(): ProcessState.Success
+{
+    return mapNotNull { state ->
+        when (state) {
+            is ProcessState.Error -> {
+                throw ProcessError(state)
+            }
+            is ProcessState.Failure -> {
+                throw RequiredProcessFailed(state)
+            }
+            is ProcessState.Success -> state
+            else -> null
+        }
+    }.single()
 }
