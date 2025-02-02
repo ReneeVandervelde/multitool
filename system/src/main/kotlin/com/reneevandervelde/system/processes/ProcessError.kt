@@ -8,5 +8,5 @@ class ProcessError(
 ): AppError(
     message = "Process failed to run with error: ${state.error.message}; command: ${state.commandString}",
     cause = state.error,
-    result = DocumentedResult.Global.Unknown,
+    result = DocumentedResult.Global.Unexpected,
 )

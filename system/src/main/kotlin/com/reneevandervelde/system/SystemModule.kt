@@ -5,7 +5,7 @@ import com.inkapplications.datetime.ZonedClock
 import com.reneevandervelde.settings.SettingsModule
 import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
-import com.reneevandervelde.system.exceptions.AppExceptionHandler
+import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +33,7 @@ class SystemModule(
     val settings = SettingsModule().settingsAccess
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(
-            AppExceptionHandler(logger),
+            SimpleErrorHandler(logger),
         )
     )
 }

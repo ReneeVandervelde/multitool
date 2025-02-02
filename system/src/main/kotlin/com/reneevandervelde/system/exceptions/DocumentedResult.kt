@@ -29,11 +29,11 @@ data class DocumentedResult(
             exitCode = ExitCode.Success,
             meaning = "The operation was successful"
         )
-        val Unknown = DocumentedResult(
+        val Unexpected = DocumentedResult(
             exitCode = ExitCode.Unknown,
-            meaning = "An unknown error occurred"
+            meaning = "An unexpected error occurred"
         )
 
-        fun values() = listOf(Success, Unknown)
+        fun values() = listOf(Success, Unexpected)
     }
 }

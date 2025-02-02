@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
 import com.reneevandervelde.system.SystemSettings
 import com.reneevandervelde.system.exceptions.DocumentedResult
+import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.processes.ExitCode
 import com.reneevandervelde.system.processes.git.GitCommands
 import com.reneevandervelde.system.processes.awaitSuccess
@@ -14,15 +15,13 @@ import kotlinx.coroutines.flow.first
 
 object UpdateCommand: SystemCommand()
 {
-    private val SignatureConfirmationFailure = DocumentedResult(
-        meaning = "Signature confirmation failed",
-        exitCode = ExitCode(10),
-    )
     private val SelfUpdateFailure = DocumentedResult(
         meaning = "Self update failed",
-        exitCode = ExitCode(11),
+        exitCode = ExitCode(10),
     )
-    override val errors: List<DocumentedResult> = listOf(SignatureConfirmationFailure)
+    override val errors: List<DocumentedResult> = listOf(
+        SelfUpdateFailure,
+    )
 
     override fun help(context: Context): String
     {
@@ -62,7 +61,7 @@ object UpdateCommand: SystemCommand()
         if (confirmation != "Y") {
             logger.info("Confirmation rejected by input. Deleting Repository.")
             settings.buildDir.deleteRecursively()
-            SignatureConfirmationFailure.throwError()
+            simpleError("Signature confirmation failed")
         }
     }
 }
