@@ -18,6 +18,10 @@ object UpdateCommand: SystemCommand()
         meaning = "Signature confirmation failed",
         exitCode = ExitCode(10),
     )
+    private val SelfUpdateFailure = DocumentedResult(
+        meaning = "Self update failed",
+        exitCode = ExitCode(11),
+    )
     override val errors: List<DocumentedResult> = listOf(SignatureConfirmationFailure)
 
     override fun help(context: Context): String
@@ -31,8 +35,10 @@ object UpdateCommand: SystemCommand()
         val settings = module.settings.systemSettings.first()
         settings.createDirs()
 
-        if (!settings.buildGitDir.exists()) {
-            cloneBuildRepository(settings)
+        SelfUpdateFailure.wrapping {
+            if (!settings.buildGitDir.exists()) {
+                cloneBuildRepository(settings)
+            }
         }
     }
 
