@@ -119,12 +119,20 @@ fun exec(
     }
 }
 
-fun Flow<ProcessState>.printCapturedLines(): Flow<ProcessState>
-{
+fun Flow<ProcessState>.printCapturedLines(
+    prefix: String? = null
+): Flow<ProcessState> {
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
-                state.output.collect { println(it) }
+                val prefixString = if (prefix == null) {
+                    state.commandString.substringAfterLast('/').substringBefore(' ')
+                } else {
+                    prefix
+                }.let {
+                    "[$it] "
+                }
+                state.output.collect { println("$prefixString$it") }
             }
             else -> {}
         }

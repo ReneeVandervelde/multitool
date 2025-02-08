@@ -3,16 +3,17 @@ package com.reneevandervelde.system.commands
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
-import com.reneevandervelde.system.SystemSettings
+import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.exceptions.simpleError
-import com.reneevandervelde.system.processes.ExitCode
+import com.reneevandervelde.system.info.OperatingSystem
+import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.git.GitCommands
-import com.reneevandervelde.system.processes.awaitSuccess
-import com.reneevandervelde.system.processes.exec
-import com.reneevandervelde.system.processes.fenceOutput
-import com.reneevandervelde.system.systemSettings
+import com.reneevandervelde.system.info.systemSettings
+import com.reneevandervelde.system.processes.*
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 object UpdateCommand: SystemCommand()
 {
@@ -34,6 +35,9 @@ object UpdateCommand: SystemCommand()
         logger.info("Updating system...")
         val settings = module.settings.systemSettings.first()
         settings.createDirs()
+        val systemInfo = module.ioScope.async {
+            SystemInfoAccess().getSystemInfo()
+        }
 
         SelfUpdateFailure.wrapping {
             if (!settings.buildGitDir.exists()) {
@@ -47,6 +51,23 @@ object UpdateCommand: SystemCommand()
             logger.info("Installing latest version")
             exec("bin/install", workingDir = settings.buildDir).fenceOutput(logger).awaitSuccess()
         }
+
+        val osTreeUpdates = module.defaultScope.launch {
+            if (systemInfo.await().operatingSystem is OperatingSystem.Linux.Fedora.Silverblue) {
+                logger.info("Installing ostree updates")
+                exec("rpm-ostree", "upgrade", capture = true).printCapturedLines().awaitSuccess()
+            }
+        }
+        val flatpakUpdates = module.defaultScope.launch {
+            if (systemInfo.await().operatingSystem is OperatingSystem.Linux) {
+                logger.info("Installing flatpak updates")
+                exec("flatpak", "update", "-y", capture = true).printCapturedLines().awaitSuccess()
+            }
+        }
+
+        osTreeUpdates.join()
+        flatpakUpdates.join()
+        logger.info("System updated")
     }
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)

@@ -1,11 +1,11 @@
-package com.reneevandervelde.system
+package com.reneevandervelde.system.info
 
 import com.reneevandervelde.settings.MultitoolSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.File
 
-internal data class SystemSettings(
+data class SystemSettings(
     val systemDir: File,
     val buildDir: File,
 ) {
@@ -17,7 +17,7 @@ internal data class SystemSettings(
     }
 }
 
-internal val MultitoolSettings.systemSettings: Flow<SystemSettings>
+val MultitoolSettings.systemSettings: Flow<SystemSettings>
     get() = allSettings.map {
         val systemDir = it["system-dir"]?.let(::File) ?: File(System.getProperty("user.home"), ".local/share/multitool")
         SystemSettings(
