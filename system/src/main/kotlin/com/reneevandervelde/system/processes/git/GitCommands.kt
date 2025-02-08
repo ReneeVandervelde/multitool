@@ -30,6 +30,19 @@ class GitCommands(
         return exec(command = args.toTypedArray(), workingDir = repositoryPath)
     }
 
+    fun pull(
+        fastForwardOnly: Boolean = true,
+        verifySignatures: Boolean = true,
+    ): Flow<ProcessState> {
+        val args = listOfNotNull(
+            "git",
+            "pull",
+            "--ff-only".takeIf { fastForwardOnly },
+            "--verify-signatures".takeIf { verifySignatures },
+        )
+        return exec(command = args.toTypedArray(), workingDir = repositoryPath)
+    }
+
     companion object
     {
         fun clone(repositoryUrl: String, target: File): Flow<ProcessState>

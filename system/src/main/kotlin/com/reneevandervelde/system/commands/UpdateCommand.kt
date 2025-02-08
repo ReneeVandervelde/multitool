@@ -9,6 +9,7 @@ import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.processes.ExitCode
 import com.reneevandervelde.system.processes.git.GitCommands
 import com.reneevandervelde.system.processes.awaitSuccess
+import com.reneevandervelde.system.processes.exec
 import com.reneevandervelde.system.processes.fenceOutput
 import com.reneevandervelde.system.systemSettings
 import kotlinx.coroutines.flow.first
@@ -38,6 +39,13 @@ object UpdateCommand: SystemCommand()
             if (!settings.buildGitDir.exists()) {
                 cloneBuildRepository(settings)
             }
+            val buildGitRepository = GitCommands(settings.buildDir)
+
+            logger.info("Pulling latest changes from build repository")
+            buildGitRepository.pull().fenceOutput(logger).awaitSuccess()
+
+            logger.info("Installing latest version")
+            exec("bin/install", workingDir = settings.buildDir).fenceOutput(logger).awaitSuccess()
         }
     }
 
@@ -47,10 +55,10 @@ object UpdateCommand: SystemCommand()
         GitCommands.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
             .fenceOutput(logger)
             .awaitSuccess()
-        val buildRepository = GitCommands(settings.buildDir)
+        val gitRepository = GitCommands(settings.buildDir)
 
-        buildRepository.status().fenceOutput(logger).awaitSuccess()
-        buildRepository.log(
+        gitRepository.status().fenceOutput(logger).awaitSuccess()
+        gitRepository.log(
             count = 8,
             showSignature = true,
             format = "Commit: %H%nDate: %ai%n",
@@ -62,6 +70,8 @@ object UpdateCommand: SystemCommand()
             logger.info("Confirmation rejected by input. Deleting Repository.")
             settings.buildDir.deleteRecursively()
             simpleError("Signature confirmation failed")
+        } else {
+            logger.info("Signature Verified.")
         }
     }
 }
