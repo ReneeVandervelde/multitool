@@ -6,6 +6,7 @@ import com.reneevandervelde.settings.SettingsModule
 import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
 import com.reneevandervelde.system.exceptions.SimpleErrorHandler
+import com.reneevandervelde.system.info.SystemInfoAccess
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -36,5 +37,7 @@ class SystemModule(
             SimpleErrorHandler(logger),
         )
     )
+    val systemInfo = SystemInfoAccess()
+
 }
 

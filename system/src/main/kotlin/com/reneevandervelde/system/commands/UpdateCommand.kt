@@ -3,17 +3,20 @@ package com.reneevandervelde.system.commands
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
+import com.inkapplications.standard.throwCancels
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.exceptions.DocumentedResult
+import com.reneevandervelde.system.exceptions.SimpleError
 import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.OperatingSystem
-import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.git.GitCommands
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.*
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 object UpdateCommand: SystemCommand()
 {
@@ -36,7 +39,7 @@ object UpdateCommand: SystemCommand()
         val settings = module.settings.systemSettings.first()
         settings.createDirs()
         val systemInfo = module.ioScope.async {
-            SystemInfoAccess().getSystemInfo()
+            module.systemInfo.getSystemInfo()
         }
 
         SelfUpdateFailure.wrapping {
@@ -52,22 +55,47 @@ object UpdateCommand: SystemCommand()
             exec("bin/install", workingDir = settings.buildDir).fenceOutput(logger).awaitSuccess()
         }
 
-        val osTreeUpdates = module.defaultScope.launch {
+        val osTreeUpdates = runAsync {
             if (systemInfo.await().operatingSystem is OperatingSystem.Linux.Fedora.Silverblue) {
                 logger.info("Installing ostree updates")
                 exec("rpm-ostree", "upgrade", capture = true).printCapturedLines().awaitSuccess()
             }
         }
-        val flatpakUpdates = module.defaultScope.launch {
+        val flatpakUpdates = runAsync {
             if (systemInfo.await().operatingSystem is OperatingSystem.Linux) {
                 logger.info("Installing flatpak updates")
                 exec("flatpak", "update", "-y", capture = true).printCapturedLines().awaitSuccess()
             }
         }
 
-        osTreeUpdates.join()
-        flatpakUpdates.join()
+        val jobs = setOf(osTreeUpdates, flatpakUpdates)
+        val results = jobs.awaitAll()
+        val failures = results.filter { it.isFailure }
+        when {
+             failures.size == 1 -> {
+                throw failures.single().exceptionOrNull()!!
+            }
+            failures.size > 1 -> {
+                throw SimpleError("Multiple failures occurred")
+            }
+        }
         logger.info("System updated")
+    }
+
+    private fun runAsync(operation: suspend () -> Unit): Deferred<Result<Unit>>
+    {
+        return module.defaultScope.async {
+            runCatching {
+                operation()
+            }.throwCancels().onFailure {
+                val message = it.message ?: it.toString()
+                when (it) {
+                    is ProcessException -> logger.error("[${it.state.shortCommand}] $message")
+                    else -> logger.error("Error while running background task", it)
+                }
+
+            }
+        }
     }
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)

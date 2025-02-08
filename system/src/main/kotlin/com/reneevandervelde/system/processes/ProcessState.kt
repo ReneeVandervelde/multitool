@@ -119,19 +119,15 @@ fun exec(
     }
 }
 
+val ProcessState.shortCommand: String get() = commandString.substringAfterLast('/').substringBefore(' ')
+
 fun Flow<ProcessState>.printCapturedLines(
     prefix: String? = null
 ): Flow<ProcessState> {
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
-                val prefixString = if (prefix == null) {
-                    state.commandString.substringAfterLast('/').substringBefore(' ')
-                } else {
-                    prefix
-                }.let {
-                    "[$it] "
-                }
+                val prefixString = "[${prefix ?: state.shortCommand}] "
                 state.output.collect { println("$prefixString$it") }
             }
             else -> {}
