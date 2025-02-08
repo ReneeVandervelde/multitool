@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
+
+"$PROJECT_DIR/bin/gradlew" system:installDist --quiet || exit 1
+"$PROJECT_DIR/system/build/install/mt-system/bin/mt-system" "$@" || exit $?
