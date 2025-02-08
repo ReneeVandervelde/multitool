@@ -36,5 +36,11 @@ mv "$INSTALL_DIR/mt-radio" "$INSTALL_DIR/mt-radio.old"
 cp -rv "$PROJECT_DIR/radio/build/install/mt-radio" "$INSTALL_DIR/" || exit 1
 rm -rfv "$INSTALL_DIR/mt-radio.old" || exit 1
 
+__title "Installing System Module"
+mv "$INSTALL_DIR/mt-system" "$INSTALL_DIR/mt-system.old"
+"$PROJECT_DIR/bin/gradlew" system:installDist || exit 1
+cp -rv "$PROJECT_DIR/system/build/install/mt-system" "$INSTALL_DIR/" || exit 1
+rm -rfv "$INSTALL_DIR/mt-system.old" || exit 1
+
 echo ""
 __success "Successfully installed"
