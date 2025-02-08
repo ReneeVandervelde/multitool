@@ -173,3 +173,4 @@ suspend fun Flow<ProcessState>.awaitSuccess(): ProcessState.Success
         }
     }.single()
 }
+
