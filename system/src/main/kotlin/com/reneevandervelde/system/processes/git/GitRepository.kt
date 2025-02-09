@@ -3,7 +3,7 @@ package com.reneevandervelde.system.processes.git
 import com.reneevandervelde.system.processes.ShellCommand
 import java.io.File
 
-class GitCommands(
+class GitRepository(
     private val repositoryPath: File
 ) {
     fun status(): ShellCommand

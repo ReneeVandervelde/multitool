@@ -9,7 +9,7 @@ import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.exceptions.SimpleError
 import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.OperatingSystem
-import com.reneevandervelde.system.processes.git.GitCommands
+import com.reneevandervelde.system.processes.git.GitRepository
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.*
 import kotlinx.coroutines.Deferred
@@ -45,7 +45,7 @@ object UpdateCommand: SystemCommand()
             if (!settings.buildGitDir.exists()) {
                 cloneBuildRepository(settings)
             }
-            val buildGitRepository = GitCommands(settings.buildDir)
+            val buildGitRepository = GitRepository(settings.buildDir)
 
             logger.info("Pulling latest changes from build repository")
             buildGitRepository.pull().exec().fenceOutput(logger).awaitSuccess()
@@ -118,11 +118,11 @@ object UpdateCommand: SystemCommand()
     private suspend fun cloneBuildRepository(settings: SystemSettings)
     {
         logger.info("Cloning repo for build")
-        GitCommands.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
+        GitRepository.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
             .exec()
             .fenceOutput(logger)
             .awaitSuccess()
-        val gitRepository = GitCommands(settings.buildDir)
+        val gitRepository = GitRepository(settings.buildDir)
 
         gitRepository.status().exec().fenceOutput(logger).awaitSuccess()
         gitRepository.log(
