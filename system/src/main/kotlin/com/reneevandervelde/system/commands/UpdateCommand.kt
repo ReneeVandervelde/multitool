@@ -17,6 +17,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
 
 object UpdateCommand: SystemCommand()
 {
@@ -55,40 +56,28 @@ object UpdateCommand: SystemCommand()
             exec("bin/install", workingDir = settings.buildDir).fenceOutput(logger).awaitSuccess()
         }
 
-        val osTreeUpdates = object: RunStep {
-            override suspend fun enabled(): Boolean {
-                return systemInfo.await().operatingSystem is OperatingSystem.Linux.Fedora.Silverblue
-            }
+        val steps = setOfNotNull(
+            ShellCommand("rpm-ostree upgrade").takeIf {
+                systemInfo.await().operatingSystem is OperatingSystem.Linux.Fedora.Silverblue
+            },
+            ShellCommand("flatpak update -y").takeIf {
+                systemInfo.await().operatingSystem is OperatingSystem.Linux
+            },
+        )
 
-            override suspend fun runStep() {
-                logger.info("Installing ostree updates")
-                exec("rpm-ostree", "upgrade", capture = true).printCapturedLines().awaitSuccess()
-            }
-
-        }
-        val flatpakUpdates = object: RunStep {
-            override suspend fun enabled(): Boolean {
-                return systemInfo.await().operatingSystem is OperatingSystem.Linux
-            }
-
-            override suspend fun runStep() {
-                logger.info("Installing flatpak updates")
-                exec("flatpak", "update", "-y", capture = true).printCapturedLines().awaitSuccess()
-            }
-
-        }
-        val steps = setOf(osTreeUpdates, flatpakUpdates)
-
-        steps.runAll()
+        steps.execAll()
         logger.info("System updated")
     }
 
-    private suspend fun Collection<RunStep>.runAll()
+    private suspend fun Collection<ShellCommand>.execAll()
     {
-        val enabled = filter { it.enabled() }
-        logger.debug("Starting ${enabled.size} steps")
-        val jobs = enabled.map { runAsync { it.runStep() } }
-        val failures = jobs.awaitAll().filter { it.isFailure }
+        val results = map {
+            runAsync {
+                it.exec(capture = true).printCapturedLines().awaitSuccess()
+            }
+        }.awaitAll()
+
+        val failures = results.filter { it.isFailure }
 
         when {
             failures.size == 1 -> {
