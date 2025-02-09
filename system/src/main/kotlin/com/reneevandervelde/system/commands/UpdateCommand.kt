@@ -48,7 +48,7 @@ object UpdateCommand: SystemCommand()
             val buildGitRepository = GitCommands(settings.buildDir)
 
             logger.info("Pulling latest changes from build repository")
-            buildGitRepository.pull().fenceOutput(logger).awaitSuccess()
+            buildGitRepository.pull().exec().fenceOutput(logger).awaitSuccess()
 
             logger.info("Installing latest version")
             exec("bin/install", workingDir = settings.buildDir).fenceOutput(logger).awaitSuccess()
@@ -119,16 +119,17 @@ object UpdateCommand: SystemCommand()
     {
         logger.info("Cloning repo for build")
         GitCommands.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
+            .exec()
             .fenceOutput(logger)
             .awaitSuccess()
         val gitRepository = GitCommands(settings.buildDir)
 
-        gitRepository.status().fenceOutput(logger).awaitSuccess()
+        gitRepository.status().exec().fenceOutput(logger).awaitSuccess()
         gitRepository.log(
             count = 8,
             showSignature = true,
             format = "Commit: %H%nDate: %ai%n",
-        ).fenceOutput(logger).awaitSuccess()
+        ).exec().fenceOutput(logger).awaitSuccess()
 
         val confirmation = terminal.prompt("Confirm repository signatures (Y/n)")
 
