@@ -30,10 +30,10 @@ class SelfUpdateOperation(
         val buildGitRepository = GitRepository(settings.buildDir)
 
         logger.info("Pulling latest changes from build repository")
-        buildGitRepository.pull().exec(capture = true).printCapturedLines().awaitSuccess()
+        buildGitRepository.pull().exec(capture = true).printCapturedLines(name).awaitSuccess()
 
         logger.info("Installing latest version")
-        exec("bin/install", workingDir = settings.buildDir, capture = true).printCapturedLines().awaitSuccess()
+        exec("bin/install", workingDir = settings.buildDir, capture = true).printCapturedLines(name).awaitSuccess()
     }
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)
@@ -41,16 +41,16 @@ class SelfUpdateOperation(
         logger.info("Cloning repo for build")
         GitRepository.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
             .exec(capture = true)
-            .printCapturedLines()
+            .printCapturedLines(name)
             .awaitSuccess()
         val gitRepository = GitRepository(settings.buildDir)
 
-        gitRepository.status().exec(capture = true).printCapturedLines().awaitSuccess()
+        gitRepository.status().exec(capture = true).printCapturedLines(name).awaitSuccess()
         gitRepository.log(
             count = 8,
             showSignature = true,
             format = "Commit: %H%nDate: %ai%n",
-        ).exec(capture = true).printCapturedLines().awaitSuccess()
+        ).exec(capture = true).printCapturedLines(name).awaitSuccess()
 
         val confirmation = terminal.prompt("Confirm repository signatures (Y/n)")
 

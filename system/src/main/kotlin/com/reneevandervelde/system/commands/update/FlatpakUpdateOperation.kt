@@ -20,6 +20,6 @@ class FlatpakUpdateOperation(
 
     override suspend fun runOperation()
     {
-        ShellCommand("flatpak update -y").exec(capture = true).printCapturedLines().awaitSuccess()
+        ShellCommand("flatpak update -y").exec(capture = true).printCapturedLines(name).awaitSuccess()
     }
 }

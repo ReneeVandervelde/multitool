@@ -20,6 +20,6 @@ class OstreeUpdateOperation(
 
     override suspend fun runOperation()
     {
-        ShellCommand("rpm-ostree upgrade").exec(capture = true).printCapturedLines().awaitSuccess()
+        ShellCommand("rpm-ostree upgrade").exec(capture = true).printCapturedLines(name).awaitSuccess()
     }
 }
