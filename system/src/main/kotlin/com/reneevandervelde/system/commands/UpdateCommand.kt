@@ -3,6 +3,7 @@ package com.reneevandervelde.system.commands
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.mordant.terminal.prompt
+import com.inkapplications.standard.CompositeException
 import com.inkapplications.standard.throwCancels
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.exceptions.DocumentedResult
@@ -94,7 +95,7 @@ object UpdateCommand: SystemCommand()
                 throw failures.single().exceptionOrNull()!!
             }
             failures.size > 1 -> {
-                throw SimpleError("Multiple failures occurred")
+                throw CompositeException(failures.map { it.exceptionOrNull()!! })
             }
         }
     }
