@@ -3,10 +3,12 @@ package com.reneevandervelde.system
 import com.github.ajalt.mordant.terminal.Terminal
 import com.inkapplications.datetime.ZonedClock
 import com.reneevandervelde.settings.SettingsModule
+import com.reneevandervelde.system.commands.update.UpdateModule
 import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
 import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import com.reneevandervelde.system.info.SystemInfoAccess
+import com.reneevandervelde.system.processes.OperationRunner
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -32,12 +34,21 @@ class SystemModule(
         logger = logger,
     )
     val settings = SettingsModule().settingsAccess
+    val operationRunner = OperationRunner(
+        runScope = ioScope,
+        logger = logger,
+    )
+    val systemInfo = SystemInfoAccess()
+    val updateModule = UpdateModule(
+        settings = settings,
+        terminal = terminal,
+        systemInfo = systemInfo,
+        logger = logger,
+    )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(
             SimpleErrorHandler(logger),
         )
     )
-    val systemInfo = SystemInfoAccess()
-
 }
 

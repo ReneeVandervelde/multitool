@@ -7,6 +7,8 @@ data class ShellCommand(
     val command: List<String>,
     val workingDir: File? = null,
 ) {
+    val name = command.first()
+
     constructor(vararg command: String, workingDir: File? = null): this(
         command = command.toList(),
         workingDir = workingDir,
