@@ -126,7 +126,7 @@ fun Flow<ProcessState>.printCapturedLines(
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
-                val prefixString = "[${prefix ?: state.shortCommand}] "
+                val prefixString = "${prefix?.let { "$it > " }}${state.shortCommand}: "
                 state.output.collect { println("$prefixString$it") }
             }
             else -> {}
