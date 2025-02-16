@@ -1,16 +1,14 @@
 package com.reneevandervelde.system.processes.git
 
-import com.reneevandervelde.system.processes.ProcessState
-import com.reneevandervelde.system.processes.exec
-import kotlinx.coroutines.flow.Flow
+import com.reneevandervelde.system.processes.ShellCommand
 import java.io.File
 
-class GitCommands(
+class GitRepository(
     private val repositoryPath: File
 ) {
-    fun status(): Flow<ProcessState>
+    fun status(): ShellCommand
     {
-        return exec("git", "status", workingDir = repositoryPath)
+        return ShellCommand("git", "status", workingDir = repositoryPath)
     }
 
     fun log(
@@ -18,7 +16,7 @@ class GitCommands(
         showSignature: Boolean = false,
         author: Array<String>? = null,
         format: String? = null,
-    ): Flow<ProcessState> {
+    ): ShellCommand {
         val args = listOfNotNull(
             "git",
             "log",
@@ -27,27 +25,27 @@ class GitCommands(
             *author?.flatMap { listOf("--author", it) }.orEmpty().toTypedArray(),
             format?.let { "--pretty=format:$it" },
         )
-        return exec(command = args.toTypedArray(), workingDir = repositoryPath)
+        return ShellCommand(command = args.toTypedArray(), workingDir = repositoryPath)
     }
 
     fun pull(
         fastForwardOnly: Boolean = true,
         verifySignatures: Boolean = true,
-    ): Flow<ProcessState> {
+    ): ShellCommand {
         val args = listOfNotNull(
             "git",
             "pull",
             "--ff-only".takeIf { fastForwardOnly },
             "--verify-signatures".takeIf { verifySignatures },
         )
-        return exec(command = args.toTypedArray(), workingDir = repositoryPath)
+        return ShellCommand(command = args.toTypedArray(), workingDir = repositoryPath)
     }
 
     companion object
     {
-        fun clone(repositoryUrl: String, target: File): Flow<ProcessState>
+        fun clone(repositoryUrl: String, target: File): ShellCommand
         {
-            return exec("git", "clone", repositoryUrl, target.absolutePath)
+            return ShellCommand("git", "clone", repositoryUrl, target.absolutePath)
         }
     }
 }

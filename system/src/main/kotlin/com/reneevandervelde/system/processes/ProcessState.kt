@@ -60,8 +60,7 @@ sealed interface ProcessState
     /**
      * Result when the command failed to run.
      *
-     * This result type has no output, and always has a failed exit code
-     * of 127.
+     * This result type has no output and no exit code.
      */
     data class Error(
         override val commandString: String,
@@ -127,7 +126,7 @@ fun Flow<ProcessState>.printCapturedLines(
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
-                val prefixString = "[${prefix ?: state.shortCommand}] "
+                val prefixString = "${prefix?.let { "$it > " }}${state.shortCommand}: "
                 state.output.collect { println("$prefixString$it") }
             }
             else -> {}
@@ -173,3 +172,4 @@ suspend fun Flow<ProcessState>.awaitSuccess(): ProcessState.Success
         }
     }.single()
 }
+
