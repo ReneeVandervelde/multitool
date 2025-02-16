@@ -2,7 +2,11 @@ package com.reneevandervelde.notion
 
 import com.reneevandervelde.notion.database.DatabaseId
 import com.reneevandervelde.notion.database.DatabaseQuery
+import com.reneevandervelde.notion.page.NewPage
 import com.reneevandervelde.notion.page.Page
+import com.reneevandervelde.notion.page.PageId
+import com.reneevandervelde.notion.property.PropertyArgument
+import com.reneevandervelde.notion.property.PropertyName
 
 interface NotionApi
 {
@@ -11,6 +15,22 @@ interface NotionApi
         database: DatabaseId,
         query: DatabaseQuery,
     ): NotionResponse.ListResponse<Page>
+
+    suspend fun createPage(
+        token: NotionBearerToken,
+        page: NewPage,
+    )
+
+    suspend fun updatePage(
+        token: NotionBearerToken,
+        page: PageId,
+        properties: Map<PropertyName, PropertyArgument>
+    )
+
+    suspend fun archivePage(
+        token: NotionBearerToken,
+        page: PageId,
+    )
 }
 
 private suspend fun NotionApi.accumulatePages(
