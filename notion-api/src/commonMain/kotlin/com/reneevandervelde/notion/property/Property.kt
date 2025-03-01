@@ -1,5 +1,7 @@
 package com.reneevandervelde.notion.property
 
+import com.reneevandervelde.notion.page.Page
+import com.reneevandervelde.notion.page.PageId
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -74,6 +76,16 @@ sealed interface Property
         override val id: PropertyId,
         val value: Boolean,
     ): Property
+
+    data class Checkbox(
+        override val id: PropertyId,
+        val value: Boolean,
+    ): Property
+
+    data class Relation(
+        override val id: PropertyId,
+        val relation: List<PageId>,
+    ): Property
 }
 
 internal class PropertySerializer: KSerializer<Property>
@@ -133,6 +145,14 @@ internal class PropertySerializer: KSerializer<Property>
                     type = surrogate.type,
                 )
             }
+            PropertyType.Relation -> Property.Relation(
+                id = surrogate.id,
+                relation = surrogate.relation?.map { it.id } ?: error("relation property must be present")
+            )
+            PropertyType.Checkbox -> Property.Checkbox(
+                id = surrogate.id,
+                value = surrogate.checkbox ?: error("boolean formula must be present")
+            )
             else -> Property.UnknownPropertyType(
                 id = surrogate.id,
                 type = surrogate.type,
@@ -154,6 +174,8 @@ internal class PropertySerializer: KSerializer<Property>
         val date: Date? = null,
         val unique_id: UniqueId? = null,
         val formula: FormulaSurrogate? = null,
+        val relation: List<PageIdSurrogate>? = null,
+        val checkbox: Boolean? = null,
     ) {
         @Serializable
         @JvmInline
@@ -170,6 +192,10 @@ internal class PropertySerializer: KSerializer<Property>
             val number: Double? = null,
             val string: String? = null,
             val boolean: Boolean? = null,
+        )
+        @Serializable
+        data class PageIdSurrogate(
+            val id: PageId,
         )
     }
 }

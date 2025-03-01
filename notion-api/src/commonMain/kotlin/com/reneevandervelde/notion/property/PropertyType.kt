@@ -18,5 +18,7 @@ value class PropertyType(val value: String)
         val Date = PropertyType("date")
         val UniqueId = PropertyType("unique_id")
         val Formula = PropertyType("formula")
+        val Relation = PropertyType("relation")
+        val Checkbox = PropertyType("checkbox")
     }
 }

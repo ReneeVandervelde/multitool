@@ -14,6 +14,7 @@ import com.reneevandervelde.notion.property.PropertyName
 open class NotionApiSpy: NotionApi
 {
     val queries = mutableListOf<DatabaseQuery>()
+    val getPages = mutableListOf<PageId>()
     val createdPages = mutableListOf<NewPage>()
     val archivedPages = mutableListOf<PageId>()
     val updatedPages = mutableListOf<Pair<PageId, Map<PropertyName, PropertyArgument>>>()
@@ -30,6 +31,11 @@ open class NotionApiSpy: NotionApi
     override suspend fun createPage(token: NotionBearerToken, page: NewPage)
     {
         createdPages.add(page)
+    }
+
+    override suspend fun getPage(token: NotionBearerToken, page: PageId): Page {
+        getPages.add(page)
+        TODO("Stub -- override and catch to use")
     }
 
     override suspend fun updatePage(

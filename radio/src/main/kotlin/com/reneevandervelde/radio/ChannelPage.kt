@@ -48,6 +48,29 @@ value class ChannelPage(
         .multi_select
         .map { it.name }
 
+    val encoding get() = page.getProperty<Property.Select>(Properties.Encoding)
+        .select
+        ?.name
+        ?.let(::Encoding)
+
+    val talkgroups get() = page.getProperty<Property.Relation>(Properties.Talkgroups)
+        .relation
+        .singleOrNull()
+
+    val busyLock get() = page.getProperty<Property.Checkbox>(Properties.BusyLock)
+        .value
+
+    val colorCode get() = page.getProperty<Property.Select>(Properties.ColorCode)
+        .select
+        ?.name
+        ?.let(::ColorCode)
+
+    val aprsTransmit get() = page.getProperty<Property.Checkbox>(Properties.AprsTransmit)
+        .value
+
+    val excludeScanning get() = page.getProperty<Property.Checkbox>(Properties.ExcludeScanning)
+        .value
+
     object Properties
     {
         val Name = PropertyName("Name")
@@ -60,5 +83,11 @@ value class ChannelPage(
         val Mode = PropertyName("Mode")
         val Valid = PropertyName("Valid")
         val Tags = PropertyName("Tags")
+        val Encoding = PropertyName("Encoding")
+        val Talkgroups = PropertyName("DMR Talkgroups")
+        val BusyLock = PropertyName("Busy Lock")
+        val ColorCode = PropertyName("DMR: Color Code")
+        val AprsTransmit = PropertyName("APRS Transmit")
+        val ExcludeScanning = PropertyName("Exclude Scanning")
     }
 }

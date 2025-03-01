@@ -44,6 +44,12 @@ internal class NotionApiClient: NotionApi
         }.body()
     }
 
+    override suspend fun getPage(token: NotionBearerToken, page: PageId): Page {
+        return httpClient.get("https://api.notion.com/v1/pages/${page.value}") {
+            notionHeaders(token)
+        }.body()
+    }
+
     override suspend fun createPage(token: NotionBearerToken, page: NewPage) {
         val response = httpClient.post("https://api.notion.com/v1/pages") {
             notionHeaders(token)
