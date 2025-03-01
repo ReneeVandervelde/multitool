@@ -1,6 +1,6 @@
 package com.reneevandervelde.system.commands.update
 
-import com.reneevandervelde.system.info.OperatingSystem
+import com.reneevandervelde.system.info.OperatingSystem.Linux.Fedora.Silverblue
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.*
 
@@ -13,7 +13,7 @@ class OstreeUpdateOperation(
     {
         val systemInfo = systemInfoAccess.getSystemInfo()
         return when {
-            systemInfo.operatingSystem is OperatingSystem.Linux.Fedora.Silverblue -> Decision.Yes("Enabled on Fedora Silverblue")
+            systemInfo.operatingSystem is Silverblue -> Decision.Yes("Enabled on Fedora Silverblue")
             else -> Decision.No("Disabled on non-Fedora Silverblue systems")
         }
     }
