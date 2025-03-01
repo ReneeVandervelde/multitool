@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Repo URL
+REPO_URL=https://github.com/ReneeVandervelde/multitool.git
+
+# Build directory
+BUILD_DIR=$HOME/.local/share/multitool/build
+
+# Clone or pull the repo:
+if [ ! -d "$BUILD_DIR" ]; then
+    git clone $REPO_URL $BUILD_DIR
+else
+    git -C $BUILD_DIR pull $REPO_URL master --ff-only
+fi
+
+# Prompt to verify signatures:
+git -C $BUILD_DIR log -n 8 --show-signature --format="Commit: %H%nMessage: %s%nDate: %ai%n"
+read -r -p "Verify signatures and Press Enter to continue..."
+
+# Run installer:
+"$BUILD_DIR/bin/install"
