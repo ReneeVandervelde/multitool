@@ -42,13 +42,13 @@ class OperationRunner(
         results.forEach {
             when (it) {
                 is OperationRunResult.Skipped -> {
-                    logger.info("[${it.operation.name}] SKIPPED: ${it.decision.rationale}")
+                    logger.info("[ ] ${it.operation.name} (skipped: ${it.decision.rationale})")
                 }
                 is OperationRunResult.Success -> {
-                    logger.info("[${it.operation.name}] COMPLETED in ${it.runTime}")
+                    logger.info("[x] ${it.operation.name} (completed in ${it.runTime})")
                 }
                 is OperationRunResult.Failure -> {
-                    logger.info("[${it.operation.name}] FAILED in ${it.runTime}")
+                    logger.info("[ ] ${it.operation.name} (FAILED after ${it.runTime})")
                 }
             }
         }
