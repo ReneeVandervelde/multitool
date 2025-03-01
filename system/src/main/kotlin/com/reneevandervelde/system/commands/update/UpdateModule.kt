@@ -23,5 +23,6 @@ class UpdateModule(
         OstreeUpdateOperation(systemInfo),
         DnfUpdateOperation(systemInfo),
         BrewUpdateOperation(systemInfo),
+        SnapUpdateOperation(systemInfo),
     )
 }
