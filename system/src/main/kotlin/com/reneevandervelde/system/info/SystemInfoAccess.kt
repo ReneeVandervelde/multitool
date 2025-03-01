@@ -22,9 +22,17 @@ class SystemInfoAccess {
             )
             else -> throw NotImplementedError("Unknown OS: $osName Version: $osVersion")
         }
+        val path = System.getenv("PATH") ?: throw IllegalStateException("PATH environment variable not set")
+        val executables = path.split(File.pathSeparator)
+            .flatMap {
+                File(it).listFiles { file, s -> file.canExecute() }
+                    ?.toList()
+                    ?: emptyList()
+            }
 
         return SystemInfo(
             operatingSystem = os,
+            executables = executables,
         )
     }
 

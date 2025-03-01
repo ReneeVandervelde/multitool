@@ -24,14 +24,21 @@ class SelfUpdateOperation(
 
     override suspend fun runOperation() {
         val settings = settings.systemSettings.first()
-        if (!settings.buildGitDir.exists()) {
+        val requiresInstall = !settings.buildGitDir.exists()
+        if (requiresInstall) {
             cloneBuildRepository(settings)
         }
         val buildGitRepository = GitRepository(settings.buildDir)
+        val initialHash = buildGitRepository.getHash()
 
         logger.info("Pulling latest changes from build repository")
         buildGitRepository.pull().exec(capture = true).printCapturedLines(name).awaitSuccess()
+        val updatedHash = buildGitRepository.getHash()
 
+        if (!requiresInstall && initialHash == updatedHash) {
+            logger.info("No changes detected in build repository")
+            return
+        }
         logger.info("Installing latest version")
         exec("bin/install", workingDir = settings.buildDir, capture = true).printCapturedLines(name).awaitSuccess()
     }

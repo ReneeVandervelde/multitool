@@ -1,6 +1,15 @@
 package com.reneevandervelde.system.processes.git
 
+import com.reneevandervelde.system.processes.ProcessState
 import com.reneevandervelde.system.processes.ShellCommand
+import com.reneevandervelde.system.processes.awaitSuccess
+import com.reneevandervelde.system.processes.exec
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import java.io.File
 
 class GitRepository(
@@ -39,6 +48,25 @@ class GitRepository(
             "--verify-signatures".takeIf { verifySignatures },
         )
         return ShellCommand(command = args.toTypedArray(), workingDir = repositoryPath)
+    }
+
+    suspend fun getHash(): String
+    {
+        return coroutineScope {
+            val args = listOf("git", "rev-parse", "HEAD")
+            val processState = ShellCommand(command = args.toTypedArray(), workingDir = repositoryPath)
+                .exec(capture = true)
+            val output = async {
+                processState
+                    .filterIsInstance<ProcessState.Capturing>()
+                    .single()
+                    .output
+                    .first()
+            }
+            processState.awaitSuccess()
+
+            output.await()
+        }
     }
 
     companion object

@@ -1,6 +1,6 @@
 package com.reneevandervelde.system.commands.update
 
-import com.reneevandervelde.system.info.OperatingSystem
+import com.reneevandervelde.system.info.OperatingSystem.Linux
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.*
 
@@ -13,8 +13,9 @@ class FlatpakUpdateOperation(
     {
         val systemInfo = systemInfoAccess.getSystemInfo()
         return when {
-            systemInfo.operatingSystem is OperatingSystem.Linux -> Decision.Yes("Enabled on Linux")
-            else -> Decision.No("Disabled on non-Linux systems")
+            systemInfo.operatingSystem !is Linux -> Decision.No("Only enabled on Linux systems")
+            systemInfo.missingCommand("flatpak") -> Decision.No("Flatpak not installed")
+            else -> Decision.Yes("Enabled on Linux systems with Flatpak installed")
         }
     }
 

@@ -1,5 +1,6 @@
 package com.reneevandervelde.system.processes
 
+import com.github.ajalt.mordant.rendering.TextColors
 import com.reneevandervelde.system.FormattedLogger
 import kotlinx.coroutines.flow.*
 import java.io.File
@@ -126,7 +127,7 @@ fun Flow<ProcessState>.printCapturedLines(
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
-                val prefixString = "${prefix?.let { "$it > " }}${state.shortCommand}: "
+                val prefixString = TextColors.gray("${prefix?.let { "$it > " }}${state.shortCommand}: ")
                 state.output.collect { println("$prefixString$it") }
             }
             else -> {}

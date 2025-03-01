@@ -17,15 +17,13 @@ class UpdateModule(
         terminal = terminal,
         logger = logger,
     )
-    private val flatpakUpdateOperation = FlatpakUpdateOperation(
-        systemInfoAccess = systemInfo,
-    )
-    private val ostreeUpdateOperation = OstreeUpdateOperation(
-        systemInfoAccess = systemInfo,
-    )
     val operations: List<Operation> = listOf(
         selfUpdateOperation,
-        flatpakUpdateOperation,
-        ostreeUpdateOperation,
+        FlatpakUpdateOperation(systemInfo),
+        OstreeUpdateOperation(systemInfo),
+        DnfUpdateOperation(systemInfo),
+        BrewUpdateOperation(systemInfo),
+        SnapUpdateOperation(systemInfo),
+        NpmUpdateOperation(systemInfo),
     )
 }
