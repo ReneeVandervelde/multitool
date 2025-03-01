@@ -37,6 +37,7 @@ class SystemModule(
     val operationRunner = OperationRunner(
         runScope = ioScope,
         logger = logger,
+        clock = clock,
     )
     val systemInfo = SystemInfoAccess()
     val updateModule = UpdateModule(
