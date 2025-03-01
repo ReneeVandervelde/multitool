@@ -24,5 +24,6 @@ class UpdateModule(
         DnfUpdateOperation(systemInfo),
         BrewUpdateOperation(systemInfo),
         SnapUpdateOperation(systemInfo),
+        NpmUpdateOperation(systemInfo),
     )
 }
