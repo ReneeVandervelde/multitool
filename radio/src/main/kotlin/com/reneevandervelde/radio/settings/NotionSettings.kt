@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.map
 
 internal data class NotionSettings(
     val apiToken: NotionBearerToken,
-    val databaseId: DatabaseId,
+    val channelDatabaseId: DatabaseId,
+    val talkgroupDatabaseId: DatabaseId,
 )
 
 internal val MultitoolSettings.radioNotionSettings: Flow<NotionSettings?>
@@ -18,7 +19,10 @@ internal val MultitoolSettings.radioNotionSettings: Flow<NotionSettings?>
             apiToken = it[NOTION_SETTINGS_API_KEY]
                 ?.let(::NotionBearerToken)
                 ?: return@map null,
-            databaseId = it["notion-radio-database-id"]
+            channelDatabaseId = it["notion-radio-channel-database-id"]
+                ?.let(::DatabaseId)
+                ?: return@map null,
+            talkgroupDatabaseId = it["notion-radio-talkgroup-database-id"]
                 ?.let(::DatabaseId)
                 ?: return@map null,
         )

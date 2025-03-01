@@ -21,6 +21,11 @@ interface NotionApi
         page: NewPage,
     )
 
+    suspend fun getPage(
+        token: NotionBearerToken,
+        page: PageId,
+    ): Page
+
     suspend fun updatePage(
         token: NotionBearerToken,
         page: PageId,

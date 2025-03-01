@@ -12,7 +12,8 @@ import com.reneevandervelde.notion.page.PageFilter
 import com.reneevandervelde.notion.page.ValueFilter
 import com.reneevandervelde.notion.queryDatabaseForAll
 import com.reneevandervelde.radio.ChannelPage
-import com.reneevandervelde.radio.formats.ChirpFormat
+import com.reneevandervelde.radio.TalkgroupPage
+import com.reneevandervelde.radio.formats.*
 import com.reneevandervelde.radio.settings.radioNotionSettings
 import com.reneevandervelde.settings.SettingsModule
 import kotlinx.coroutines.flow.first
@@ -22,7 +23,12 @@ object ChannelExportCommand: CliktCommand(
     name = "export"
 ) {
     val format by option().choice(
-        "chirp",
+        "chirp-uv5r",
+        "chirp-bff8hp",
+        "cps-channels",
+        "cps-zones",
+        "cps-talkgroups",
+        "cps-scans",
     ).default("chirp")
 
     val tags by option("--tag").multiple()
@@ -35,10 +41,11 @@ object ChannelExportCommand: CliktCommand(
                     println("Radio settings not configured.")
                     return@runBlocking
                 }
+            val notion = NotionModule().client
 
-            val results = NotionModule().client.queryDatabaseForAll(
+            val channelResults = notion.queryDatabaseForAll(
                 token = settings.apiToken,
-                database = settings.databaseId,
+                database = settings.channelDatabaseId,
                 query = DatabaseQuery(
                     filter = PageFilter.And(
                         listOfNotNull(
@@ -58,15 +65,30 @@ object ChannelExportCommand: CliktCommand(
                     ),
                 )
             )
-
-            val csvFields = ChirpFormat.fields(
-                channels = results.map { ChannelPage(it) }
+            val talkgroupResults = notion.queryDatabaseForAll(
+                token = settings.apiToken,
+                database = settings.talkgroupDatabaseId,
+                query = DatabaseQuery()
             )
 
-            val headerRow = csvFields.flatMap { it.keys }
+            val formatter: RadioExportFormat = when (format) {
+                "chirp-uv5r" -> ChirpFormat(ChirpVariant.Uv5r)
+                "chirp-bff8hp" -> ChirpFormat(ChirpVariant.BfF8hp)
+                "cps-channels" -> CpsChannelFormat
+                "cps-zones" -> CpsZoneFormat
+                "cps-talkgroups" -> CpsTalkgroupFormat
+                "cps-scans" -> CpsScanFormat
+                else -> error("Unknown format: $format")
+            }
+            val csvFields = formatter.fields(
+                channels = channelResults.map { ChannelPage(it) },
+                talkgroups = talkgroupResults.map { TalkgroupPage(it) }.toSet(),
+            )
+
+            val headerRow = csvFields.rows.flatMap { it.keys }
                 .distinct()
                 .joinToString(",")
-            val valueRows = csvFields.map {
+            val valueRows = csvFields.rows.map {
                 it.values.joinToString(",")
             }
 
