@@ -21,6 +21,7 @@ class UpdateModule(
         selfUpdateOperation,
         FlatpakUpdateOperation(systemInfo),
         OstreeUpdateOperation(systemInfo),
-        DnfUpdateOperation(systemInfo)
+        DnfUpdateOperation(systemInfo),
+        BrewUpdateOperation(systemInfo),
     )
 }
