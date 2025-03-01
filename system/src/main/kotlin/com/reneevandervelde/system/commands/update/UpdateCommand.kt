@@ -4,6 +4,9 @@ import com.github.ajalt.clikt.core.Context
 import com.reneevandervelde.system.commands.SystemCommand
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.info.systemSettings
+import com.reneevandervelde.system.processes.ShellCommand
+import com.reneevandervelde.system.processes.awaitSuccess
+import com.reneevandervelde.system.processes.exec
 import kotlinx.coroutines.flow.first
 
 object UpdateCommand: SystemCommand()
@@ -17,6 +20,7 @@ object UpdateCommand: SystemCommand()
 
     override suspend fun runCommand()
     {
+        ShellCommand("sudo -v").exec().awaitSuccess()
         logger.info("Updating system...")
         val settings = module.settings.systemSettings.first()
         settings.createDirs()
