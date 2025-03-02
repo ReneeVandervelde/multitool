@@ -24,11 +24,11 @@ class SelfUpdateOperation(
 
     override suspend fun runOperation() {
         val settings = settings.systemSettings.first()
-        val requiresInstall = !settings.buildGitDir.exists()
+        val requiresInstall = !settings.multitoolGitDir.exists()
         if (requiresInstall) {
             cloneBuildRepository(settings)
         }
-        val buildGitRepository = GitRepository(settings.buildDir)
+        val buildGitRepository = GitRepository(settings.multitoolBuildDir)
         val initialHash = buildGitRepository.getHash()
 
         logger.info("Pulling latest changes from build repository")
@@ -40,17 +40,17 @@ class SelfUpdateOperation(
             return
         }
         logger.info("Installing latest version")
-        exec("bin/install", workingDir = settings.buildDir, capture = true).printCapturedLines(name).awaitSuccess()
+        exec("bin/gradlew system:installAndConfigure", workingDir = settings.multitoolBuildDir, capture = true).printCapturedLines(name).awaitSuccess()
     }
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)
     {
         logger.info("Cloning repo for build")
-        GitRepository.clone("https://github.com/ReneeVandervelde/multitool.git", settings.buildDir)
+        GitRepository.clone("https://github.com/ReneeVandervelde/multitool.git", settings.multitoolBuildDir)
             .exec(capture = true)
             .printCapturedLines(name)
             .awaitSuccess()
-        val gitRepository = GitRepository(settings.buildDir)
+        val gitRepository = GitRepository(settings.multitoolBuildDir)
 
         gitRepository.status().exec(capture = true).printCapturedLines(name).awaitSuccess()
         gitRepository.log(
@@ -63,7 +63,7 @@ class SelfUpdateOperation(
 
         if (confirmation != "Y") {
             logger.info("Confirmation rejected by input. Deleting Repository.")
-            settings.buildDir.deleteRecursively()
+            settings.multitoolBuildDir.deleteRecursively()
             simpleError("Signature confirmation failed")
         } else {
             logger.info("Signature Verified.")

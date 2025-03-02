@@ -18,4 +18,4 @@ git -C $BUILD_DIR log -n 8 --show-signature --format="Commit: %H%nMessage: %s%nD
 read -r -p "Verify signatures and Press Enter to continue..."
 
 # Run installer:
-"$BUILD_DIR/bin/install"
+"$BUILD_DIR/bin/gradle installAll"

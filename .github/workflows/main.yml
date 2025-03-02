@@ -17,4 +17,4 @@ jobs:
                     distribution: temurin
             -
                 name: Checks
-                run: bin/check
+                run: bin/gradlew checkAll
