@@ -40,7 +40,7 @@ class SelfUpdateOperation(
             return
         }
         logger.info("Installing latest version")
-        exec("bin/gradlew system:installAndConfigure", workingDir = settings.multitoolBuildDir, capture = true).printCapturedLines(name).awaitSuccess()
+        exec("bin/gradlew install", workingDir = settings.multitoolBuildDir, capture = true).printCapturedLines(name).awaitSuccess()
     }
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)
