@@ -1,5 +1,3 @@
-import java.nio.file.Files
-
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
@@ -20,16 +18,7 @@ dependencies {
     implementation(libs.local.settings)
 }
 
-tasks.register("configureSelf", Exec::class) {
-    dependsOn("installDist")
-    commandLine("${project.rootDir.absolutePath}/build/install/mt-system/bin/mt-system", "configure", "self")
-}
-
-tasks.register("installProfile", Exec::class) {
+tasks.register("install", Exec::class) {
     workingDir = project.rootDir
     commandLine("${project.rootDir.absolutePath}/src/main/bash/install-profile")
-}
-tasks.register("installAndConfigure") {
-    dependsOn("installProfile")
-    dependsOn("configureSelf")
 }

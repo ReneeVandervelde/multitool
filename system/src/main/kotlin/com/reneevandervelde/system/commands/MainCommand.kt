@@ -4,7 +4,6 @@ import com.github.ajalt.clikt.core.*
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.Theme
 import com.github.ajalt.mordant.terminal.Terminal
-import com.reneevandervelde.system.commands.configure.ConfigureCommand
 import com.reneevandervelde.system.commands.update.UpdateCommand
 
 object MainCommand: NoOpCliktCommand()
@@ -24,7 +23,6 @@ object MainCommand: NoOpCliktCommand()
 
         subcommands(
             UpdateCommand,
-            ConfigureCommand,
         )
     }
 }
