@@ -5,23 +5,28 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.File
 
-data class SystemSettings(
-    val systemDir: File,
-    val buildDir: File,
+class SystemSettings(
 ) {
-    val buildGitDir = File(buildDir, ".git")
+    val hostBinDir = File(System.getProperty("user.home"), ".local/bin")
+    val hostBashProfile = File(System.getProperty("user.home"), ".bash_profile")
+    val hostLibDir = File(System.getProperty("user.home"), ".local/share")
+    val hostBinSystemLink = File(hostBinDir, "mt-system")
+
+    val multitoolLibDir = File(hostLibDir, "multitool")
+    val multitoolBuildDir = File(multitoolLibDir, "build")
+    val multitoolGitDir = File(multitoolBuildDir, ".git")
+    val systemSrcRoot = File(multitoolBuildDir, "system/src")
+    val systemMainBashProfile = File(systemSrcRoot, "main/bash/profiles/main.bash_profile")
+    val systemInstallBin = File(multitoolBuildDir, "system/build/install/mt-system/bin/mt-system")
 
     fun createDirs() {
-        systemDir.mkdirs()
-        buildDir.mkdirs()
+        hostBinDir.mkdirs()
+        multitoolLibDir.mkdirs()
+        multitoolBuildDir.mkdirs()
     }
 }
 
 val MultitoolSettings.systemSettings: Flow<SystemSettings>
     get() = allSettings.map {
-        val systemDir = it["system-dir"]?.let(::File) ?: File(System.getProperty("user.home"), ".local/share/multitool")
-        SystemSettings(
-            systemDir = systemDir,
-            buildDir = it["system-dir-build"]?.let(::File) ?: File(systemDir, "build")
-        )
+        SystemSettings()
     }

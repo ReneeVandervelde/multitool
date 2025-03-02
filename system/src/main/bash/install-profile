@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Resolve project root
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+export PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )/../../.." >/dev/null 2>&1 && pwd )"
+
+echo "Linking Bash Config"
+if [ -L $HOME/.bash_profile ]; then
+    echo "Removing existing symlink"
+    rm -v $HOME/.bash_profile || exit $?;
+elif [ -f "$HOME/.bash_profile" ]; then
+    if [ -f "$HOME/.local.bash_profile" ]; then
+        echo "Moving existing local and primary bash profile"
+        TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+        NEW_LOCAL="$HOME/.TIMESTAMP.local.bash_profile"
+        NEW_PARENT="$HOME/.$TIMESTAMP.bash_profile"
+        mv -v "$HOME/.local.bash_profile" "$NEW_LOCAL" || exit $?;
+        mv -v "$HOME/.bash_profile" "$NEW_PARENT" || exit $?;
+        echo "source $NEW_PARENT" > "$HOME/.local.bash_profile" || exit $?;
+        echo "source $NEW_LOCAL" > "$HOME/.local.bash_profile" || exit $?;
+    else
+        echo "Moving current bash file to local config"
+        mv -v "$HOME/.bash_profile" "$HOME/.local.bash_profile" || exit $?;
+    fi
+fi
+ln -sv "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" "$HOME/.bash_profile" || exit $?;
+source "$HOME/.bash_profile" || exit $?;
