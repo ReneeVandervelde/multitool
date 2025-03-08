@@ -1,17 +1,16 @@
-package com.reneevandervelde.system.commands.update
+package com.reneevandervelde.system.packagemanager
 
 import com.reneevandervelde.system.info.OperatingSystem.Linux.Fedora
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.*
 
-class DnfUpdateOperation(
+class Dnf(
     private val systemInfoAccess: SystemInfoAccess,
-): Operation {
-    override val name: String = "Dnf Update"
-
+): PackageManager {
     override suspend fun enabled(): Decision
     {
         val systemInfo = systemInfoAccess.getSystemInfo()
+
         return when {
             systemInfo.operatingSystem !is Fedora -> Decision.No("Disabled on non-Fedora systems")
             systemInfo.operatingSystem is Fedora.Silverblue -> Decision.No("Not needed on Fedora Silverblue")
@@ -19,8 +18,11 @@ class DnfUpdateOperation(
         }
     }
 
-    override suspend fun runOperation()
+    override suspend fun updateAll()
     {
-        ShellCommand("sudo dnf upgrade").exec(capture = true).printCapturedLines(name).awaitSuccess()
+        ShellCommand("sudo dnf upgrade")
+            .exec(capture = true)
+            .printCapturedLines("DNF Updates")
+            .awaitSuccess()
     }
 }

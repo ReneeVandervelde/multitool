@@ -6,6 +6,11 @@ class PackageManagerModule(
     private val systemInfoAccess: SystemInfoAccess,
 ) {
     val packageManagers: Set<PackageManager> = setOf(
+        Dnf(systemInfoAccess),
+        Flatpak(systemInfoAccess),
+        Homebrew(systemInfoAccess),
+        Npm(systemInfoAccess),
         RpmOstree(systemInfoAccess),
+        Snap(systemInfoAccess),
     )
 }

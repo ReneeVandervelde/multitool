@@ -22,11 +22,6 @@ class UpdateModule(
     )
     val operations: List<Operation> = listOf(
         selfUpdateOperation,
-        FlatpakUpdateOperation(systemInfo),
-        DnfUpdateOperation(systemInfo),
-        BrewUpdateOperation(systemInfo),
-        SnapUpdateOperation(systemInfo),
-        NpmUpdateOperation(systemInfo),
         *packageManagers.map { it.toUpdateOperation() }.toTypedArray(),
     )
 }

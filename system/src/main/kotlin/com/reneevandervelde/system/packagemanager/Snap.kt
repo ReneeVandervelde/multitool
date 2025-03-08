@@ -1,17 +1,15 @@
-package com.reneevandervelde.system.commands.update
+package com.reneevandervelde.system.packagemanager
 
 import com.reneevandervelde.system.info.OperatingSystem
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.*
 
-class SnapUpdateOperation(
+class Snap(
     private val systemInfoAccess: SystemInfoAccess,
-): Operation {
-    override val name: String = "Snap Update"
-
-    override suspend fun enabled(): Decision
-    {
+): PackageManager {
+    override suspend fun enabled(): Decision {
         val systemInfo = systemInfoAccess.getSystemInfo()
+
         return when {
             systemInfo.operatingSystem !is OperatingSystem.Linux -> Decision.No("Only enabled on Linux systems")
             systemInfo.missingCommand("snap") -> Decision.No("Snap not installed")
@@ -19,8 +17,10 @@ class SnapUpdateOperation(
         }
     }
 
-    override suspend fun runOperation()
-    {
-        ShellCommand("sudo snap refresh").exec(capture = true).printCapturedLines(name).awaitSuccess()
+    override suspend fun updateAll() {
+        ShellCommand("sudo snap refresh")
+            .exec(capture = true)
+            .printCapturedLines("Snap Updates")
+            .awaitSuccess()
     }
 }
