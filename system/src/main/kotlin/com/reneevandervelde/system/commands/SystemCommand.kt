@@ -31,7 +31,6 @@ abstract class SystemCommand: CliktCommand()
             require(it == it.distinctBy { it.exitCode }) { "Duplicate error codes detected in command" }
         }
 
-        context.terminal.println("test")
         val header = TextColors.yellow("Return Codes:")
         val other = allErrors
             .sortedBy { it.exitCode.code }
