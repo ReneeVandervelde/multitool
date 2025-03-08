@@ -43,12 +43,12 @@ class SystemModule(
     val systemInfo = SystemInfoAccess()
     val appsModule = AppsModule(
         systemInfoAccess = systemInfo,
-    )
-    val updateModule = UpdateModule(
-        settings = settings,
+        multitoolSettings = settings,
         terminal = terminal,
         logger = logger,
-        packageManagers = appsModule.packageManagers,
+    )
+    val updateModule = UpdateModule(
+        appsModule = appsModule,
     )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(

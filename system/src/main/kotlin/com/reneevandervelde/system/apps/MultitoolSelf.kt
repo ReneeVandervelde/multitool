@@ -1,4 +1,4 @@
-package com.reneevandervelde.system.commands.update
+package com.reneevandervelde.system.apps
 
 import com.github.ajalt.mordant.terminal.Terminal
 import com.github.ajalt.mordant.terminal.prompt
@@ -7,22 +7,18 @@ import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.*
-import com.reneevandervelde.system.apps.GitRepository
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.first
 
-class SelfUpdateOperation(
+class MultitoolSelf(
     private val settings: MultitoolSettings,
     private val terminal: Terminal,
     private val logger: KimchiLogger,
-): Operation {
-    override val name: String = "Self Update"
+) {
+    private val updateName = "Multitool Updates"
 
-    override suspend fun enabled(): Decision {
-        return Decision.Yes("Always enabled")
-    }
-
-    override suspend fun runOperation() {
+    suspend fun update()
+    {
         val settings = settings.systemSettings.first()
         val requiresInstall = !settings.multitoolGitDir.exists()
         if (requiresInstall) {
@@ -32,7 +28,9 @@ class SelfUpdateOperation(
         val initialHash = buildGitRepository.getHash()
 
         logger.info("Pulling latest changes from build repository")
-        buildGitRepository.pull().exec(capture = true).printCapturedLines(name).awaitSuccess()
+        buildGitRepository.pull().exec(capture = true)
+            .printCapturedLines(updateName)
+            .awaitSuccess()
         val updatedHash = buildGitRepository.getHash()
 
         if (!requiresInstall && initialHash == updatedHash) {
@@ -40,7 +38,9 @@ class SelfUpdateOperation(
             return
         }
         logger.info("Installing latest version")
-        exec("bin/gradlew install", workingDir = settings.multitoolBuildDir, capture = true).printCapturedLines(name).awaitSuccess()
+        exec("bin/gradlew install", workingDir = settings.multitoolBuildDir, capture = true)
+            .printCapturedLines(updateName)
+            .awaitSuccess()
     }
 
     private suspend fun cloneBuildRepository(settings: SystemSettings)
@@ -48,16 +48,16 @@ class SelfUpdateOperation(
         logger.info("Cloning repo for build")
         GitRepository.clone("https://github.com/ReneeVandervelde/multitool.git", settings.multitoolBuildDir)
             .exec(capture = true)
-            .printCapturedLines(name)
+            .printCapturedLines(updateName)
             .awaitSuccess()
         val gitRepository = GitRepository(settings.multitoolBuildDir)
 
-        gitRepository.status().exec(capture = true).printCapturedLines(name).awaitSuccess()
+        gitRepository.status().exec(capture = true).printCapturedLines(updateName).awaitSuccess()
         gitRepository.log(
             count = 8,
             showSignature = true,
             format = "Commit: %H%nDate: %ai%n",
-        ).exec(capture = true).printCapturedLines(name).awaitSuccess()
+        ).exec(capture = true).printCapturedLines(updateName).awaitSuccess()
 
         val confirmation = terminal.prompt("Confirm repository signatures (Y/n)")
 
@@ -69,4 +69,13 @@ class SelfUpdateOperation(
             logger.info("Signature Verified.")
         }
     }
+}
+
+val MultitoolSelf.updateOperation get() = object: Operation {
+    override val name: String = "Self Update"
+    override suspend fun enabled(): Decision
+    {
+        return Decision.Yes("Always enabled")
+    }
+    override suspend fun runOperation() = update()
 }

@@ -1,27 +1,17 @@
 package com.reneevandervelde.system.commands.update
 
-import com.github.ajalt.mordant.terminal.Terminal
-import com.reneevandervelde.settings.MultitoolSettings
-import com.reneevandervelde.system.info.SystemInfoAccess
+import com.reneevandervelde.system.apps.AppsModule
+import com.reneevandervelde.system.apps.updateOperation
 import com.reneevandervelde.system.packagemanager.PackageManager
 import com.reneevandervelde.system.processes.Decision
 import com.reneevandervelde.system.processes.Operation
-import kimchi.logger.KimchiLogger
 
 class UpdateModule(
-    settings: MultitoolSettings,
-    terminal: Terminal,
-    packageManagers: Set<PackageManager>,
-    logger: KimchiLogger,
+    appsModule: AppsModule,
 ) {
-    private val selfUpdateOperation = SelfUpdateOperation(
-        settings = settings,
-        terminal = terminal,
-        logger = logger,
-    )
     val operations: List<Operation> = listOf(
-        selfUpdateOperation,
-        *packageManagers.map { it.toUpdateOperation() }.toTypedArray(),
+        appsModule.multitoolSelf.updateOperation,
+        *appsModule.packageManagers.map { it.toUpdateOperation() }.toTypedArray(),
     )
 }
 

@@ -1,11 +1,23 @@
 package com.reneevandervelde.system.apps
 
+import com.github.ajalt.mordant.terminal.Terminal
+import com.reneevandervelde.settings.MultitoolSettings
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.packagemanager.PackageManager
+import kimchi.logger.KimchiLogger
 
 class AppsModule(
-    private val systemInfoAccess: SystemInfoAccess,
+    systemInfoAccess: SystemInfoAccess,
+    multitoolSettings: MultitoolSettings,
+    terminal: Terminal,
+    logger: KimchiLogger,
 ) {
+    val multitoolSelf = MultitoolSelf(
+        settings = multitoolSettings,
+        terminal = terminal,
+        logger = logger,
+    )
+
     val packageManagers: Set<PackageManager> = setOf(
         Dnf(systemInfoAccess),
         Flatpak(systemInfoAccess),
