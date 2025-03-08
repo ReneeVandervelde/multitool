@@ -1,17 +1,17 @@
-package com.reneevandervelde.system.commands.update
+package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.system.info.OperatingSystem.Linux
 import com.reneevandervelde.system.info.SystemInfoAccess
+import com.reneevandervelde.system.packagemanager.PackageManager
 import com.reneevandervelde.system.processes.*
 
-class FlatpakUpdateOperation(
+class Flatpak(
     private val systemInfoAccess: SystemInfoAccess,
-): Operation {
-    override val name: String = "Flatpak Update"
-
+): PackageManager {
     override suspend fun enabled(): Decision
     {
         val systemInfo = systemInfoAccess.getSystemInfo()
+
         return when {
             systemInfo.operatingSystem !is Linux -> Decision.No("Only enabled on Linux systems")
             systemInfo.missingCommand("flatpak") -> Decision.No("Flatpak not installed")
@@ -19,8 +19,11 @@ class FlatpakUpdateOperation(
         }
     }
 
-    override suspend fun runOperation()
+    override suspend fun updateAll()
     {
-        ShellCommand("flatpak update -y").exec(capture = true).printCapturedLines(name).awaitSuccess()
+        ShellCommand("flatpak update -y")
+            .exec(capture = true)
+            .printCapturedLines("Flatpak Updates")
+            .awaitSuccess()
     }
 }

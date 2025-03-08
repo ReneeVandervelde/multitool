@@ -7,7 +7,7 @@ import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.*
-import com.reneevandervelde.system.processes.git.GitRepository
+import com.reneevandervelde.system.apps.GitRepository
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.first
 
