@@ -1,4 +1,4 @@
 package com.reneevandervelde.system.packagemanager
 
 @JvmInline
-value class AppId(val key: String)
+value class AppPackageId(val key: String)

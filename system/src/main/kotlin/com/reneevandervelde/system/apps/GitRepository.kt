@@ -1,4 +1,4 @@
-package com.reneevandervelde.system.processes.git
+package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.system.processes.ProcessState
 import com.reneevandervelde.system.processes.ShellCommand
@@ -6,7 +6,6 @@ import com.reneevandervelde.system.processes.awaitSuccess
 import com.reneevandervelde.system.processes.exec
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.single

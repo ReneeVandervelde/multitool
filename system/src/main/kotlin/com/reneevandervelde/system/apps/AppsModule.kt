@@ -1,8 +1,9 @@
-package com.reneevandervelde.system.packagemanager
+package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.system.info.SystemInfoAccess
+import com.reneevandervelde.system.packagemanager.PackageManager
 
-class PackageManagerModule(
+class AppsModule(
     private val systemInfoAccess: SystemInfoAccess,
 ) {
     val packageManagers: Set<PackageManager> = setOf(
