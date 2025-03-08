@@ -8,6 +8,7 @@ import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
 import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import com.reneevandervelde.system.info.SystemInfoAccess
+import com.reneevandervelde.system.packagemanager.PackageManagerModule
 import com.reneevandervelde.system.processes.OperationRunner
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
@@ -40,11 +41,15 @@ class SystemModule(
         clock = clock,
     )
     val systemInfo = SystemInfoAccess()
+    val packageManagerModule = PackageManagerModule(
+        systemInfoAccess = systemInfo,
+    )
     val updateModule = UpdateModule(
         settings = settings,
         terminal = terminal,
         systemInfo = systemInfo,
         logger = logger,
+        packageManagers = packageManagerModule.packageManagers,
     )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(
