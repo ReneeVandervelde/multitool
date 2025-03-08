@@ -127,7 +127,7 @@ fun Flow<ProcessState>.printCapturedLines(
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
-                val prefixString = TextColors.gray("${prefix?.let { "$it > " }}${state.shortCommand}: ")
+                val prefixString = TextColors.gray("${prefix?.let { "$it > " }.orEmpty()}${state.shortCommand}: ")
                 state.output.collect { println("$prefixString$it") }
             }
             else -> {}
