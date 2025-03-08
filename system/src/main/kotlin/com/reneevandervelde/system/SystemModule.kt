@@ -47,7 +47,6 @@ class SystemModule(
     val updateModule = UpdateModule(
         settings = settings,
         terminal = terminal,
-        systemInfo = systemInfo,
         logger = logger,
         packageManagers = appsModule.packageManagers,
     )

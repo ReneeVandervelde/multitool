@@ -11,7 +11,6 @@ import kimchi.logger.KimchiLogger
 class UpdateModule(
     settings: MultitoolSettings,
     terminal: Terminal,
-    systemInfo: SystemInfoAccess,
     packageManagers: Set<PackageManager>,
     logger: KimchiLogger,
 ) {
