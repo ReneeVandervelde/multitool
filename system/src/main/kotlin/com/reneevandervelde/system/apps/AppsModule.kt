@@ -3,7 +3,7 @@ package com.reneevandervelde.system.apps
 import com.github.ajalt.mordant.terminal.Terminal
 import com.reneevandervelde.settings.MultitoolSettings
 import com.reneevandervelde.system.info.SystemInfoAccess
-import com.reneevandervelde.system.packagemanager.PackageManager
+import com.reneevandervelde.system.apps.packagemanager.PackageManager
 import kimchi.logger.KimchiLogger
 
 class AppsModule(
@@ -25,5 +25,10 @@ class AppsModule(
         Npm(systemInfoAccess),
         RpmOstree(systemInfoAccess),
         Snap(systemInfoAccess),
+    )
+
+    val updatables: Set<Updatable> = setOf(
+        multitoolSelf,
+        *packageManagers.toTypedArray(),
     )
 }

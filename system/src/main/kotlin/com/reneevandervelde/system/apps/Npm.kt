@@ -1,7 +1,7 @@
 package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.system.info.SystemInfoAccess
-import com.reneevandervelde.system.packagemanager.PackageManager
+import com.reneevandervelde.system.apps.packagemanager.PackageManager
 import com.reneevandervelde.system.processes.*
 
 class Npm(
@@ -17,7 +17,7 @@ class Npm(
         }
     }
 
-    override suspend fun updateAll() {
+    override suspend fun update() {
         val name = "Npm Updates"
 
         ShellCommand("npm install npm -g")

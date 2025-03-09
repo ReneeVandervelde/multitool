@@ -3,7 +3,6 @@ package com.reneevandervelde.system
 import com.github.ajalt.mordant.terminal.Terminal
 import com.inkapplications.datetime.ZonedClock
 import com.reneevandervelde.settings.SettingsModule
-import com.reneevandervelde.system.commands.update.UpdateModule
 import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
 import com.reneevandervelde.system.exceptions.SimpleErrorHandler
@@ -46,9 +45,6 @@ class SystemModule(
         multitoolSettings = settings,
         terminal = terminal,
         logger = logger,
-    )
-    val updateModule = UpdateModule(
-        appsModule = appsModule,
     )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(

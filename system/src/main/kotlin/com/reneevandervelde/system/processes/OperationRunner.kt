@@ -42,7 +42,7 @@ class OperationRunner(
         results.forEach {
             when (it) {
                 is OperationRunResult.Skipped -> {
-                    logger.info("[ ] ${it.operation.name} (skipped: ${it.decision.rationale})")
+                    logger.info("[-] ${it.operation.name} (skipped: ${it.decision.rationale})")
                 }
                 is OperationRunResult.Success -> {
                     logger.info("[x] ${it.operation.name} (completed in ${it.runTime})")
@@ -64,7 +64,7 @@ class OperationRunner(
                 throw CompositeException(failures.map { it.error })
             }
             else -> {
-                logger.debug("Updates Completed")
+                logger.debug("operations Completed")
             }
         }
     }

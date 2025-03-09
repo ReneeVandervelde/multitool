@@ -14,10 +14,14 @@ class MultitoolSelf(
     private val settings: MultitoolSettings,
     private val terminal: Terminal,
     private val logger: KimchiLogger,
-) {
+): Updatable {
     private val updateName = "Multitool Updates"
 
-    suspend fun update()
+    override suspend fun enabled(): Decision {
+        return Decision.Yes("Always Enabled")
+    }
+
+    override suspend fun update()
     {
         val settings = settings.systemSettings.first()
         val requiresInstall = !settings.multitoolGitDir.exists()
@@ -38,7 +42,7 @@ class MultitoolSelf(
             return
         }
         logger.info("Installing latest version")
-        exec("bin/gradlew install", workingDir = settings.multitoolBuildDir, capture = true)
+        exec("bin/gradlew system:install", workingDir = settings.multitoolBuildDir, capture = true)
             .printCapturedLines(updateName)
             .awaitSuccess()
     }

@@ -1,6 +1,7 @@
 package com.reneevandervelde.system.commands.update
 
 import com.github.ajalt.clikt.core.Context
+import com.reneevandervelde.system.apps.toUpdateOperation
 import com.reneevandervelde.system.commands.SystemCommand
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.info.systemSettings
@@ -25,7 +26,7 @@ object UpdateCommand: SystemCommand()
         val settings = module.settings.systemSettings.first()
         settings.createDirs()
 
-        module.operationRunner.run(module.updateModule.operations)
+        module.operationRunner.run(module.appsModule.updatables.map { it.toUpdateOperation() })
         logger.info("System updated")
     }
 }
