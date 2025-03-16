@@ -3,13 +3,15 @@ package com.reneevandervelde.system
 import com.github.ajalt.mordant.terminal.Terminal
 import com.inkapplications.datetime.ZonedClock
 import com.reneevandervelde.settings.SettingsModule
-import com.reneevandervelde.system.commands.update.UpdateModule
 import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
 import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.AppsModule
 import com.reneevandervelde.system.processes.OperationRunner
+import com.reneevandervelde.system.render.TerminalRenderer
+import com.reneevandervelde.system.render.TextRenderer
+import com.reneevandervelde.system.render.TtyLayout
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +29,7 @@ class SystemModule(
         isVerbose = isVerbose,
         clock = clock,
     )
+    val outputLayout = TtyLayout()
     private val logger: KimchiLogger = Kimchi.apply {
         addLog(logWriter)
     }
@@ -36,6 +39,7 @@ class SystemModule(
     )
     val settings = SettingsModule().settingsAccess
     val operationRunner = OperationRunner(
+        output = outputLayout,
         runScope = ioScope,
         logger = logger,
         clock = clock,
@@ -43,12 +47,18 @@ class SystemModule(
     val systemInfo = SystemInfoAccess()
     val appsModule = AppsModule(
         systemInfoAccess = systemInfo,
-    )
-    val updateModule = UpdateModule(
-        settings = settings,
+        multitoolSettings = settings,
+        output = outputLayout,
         terminal = terminal,
         logger = logger,
-        packageManagers = appsModule.packageManagers,
+    )
+    val renderer = TerminalRenderer(
+        renderers = listOf(
+            TextRenderer(
+                terminal = terminal,
+                logger = logger,
+            )
+        ),
     )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(

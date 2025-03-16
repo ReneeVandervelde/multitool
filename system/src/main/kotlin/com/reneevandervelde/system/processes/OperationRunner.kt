@@ -1,6 +1,8 @@
 package com.reneevandervelde.system.processes
 
 import com.inkapplications.standard.CompositeException
+import com.reneevandervelde.system.render.TtyLayout
+import com.reneevandervelde.system.render.println
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -9,6 +11,7 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration
 
 class OperationRunner(
+    val output: TtyLayout,
     val runScope: CoroutineScope,
     val logger: KimchiLogger,
     val clock: Clock,
@@ -42,13 +45,13 @@ class OperationRunner(
         results.forEach {
             when (it) {
                 is OperationRunResult.Skipped -> {
-                    logger.info("[ ] ${it.operation.name} (skipped: ${it.decision.rationale})")
+                    output.println("[-] ${it.operation.name} (skipped: ${it.decision.rationale})")
                 }
                 is OperationRunResult.Success -> {
-                    logger.info("[x] ${it.operation.name} (completed in ${it.runTime})")
+                    output.println("[x] ${it.operation.name} (completed in ${it.runTime})")
                 }
                 is OperationRunResult.Failure -> {
-                    logger.info("[ ] ${it.operation.name} (FAILED after ${it.runTime})")
+                    output.println("[ ] ${it.operation.name} (FAILED after ${it.runTime})")
                 }
             }
         }
@@ -64,7 +67,7 @@ class OperationRunner(
                 throw CompositeException(failures.map { it.error })
             }
             else -> {
-                logger.debug("Updates Completed")
+                logger.debug("operations Completed")
             }
         }
     }

@@ -2,11 +2,13 @@ package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.system.info.OperatingSystem
 import com.reneevandervelde.system.info.SystemInfoAccess
-import com.reneevandervelde.system.packagemanager.PackageManager
+import com.reneevandervelde.system.apps.packagemanager.PackageManager
 import com.reneevandervelde.system.processes.*
+import com.reneevandervelde.system.render.TtyLayout
 
 class Homebrew(
-    val systemInfoAccess: SystemInfoAccess,
+    private val systemInfoAccess: SystemInfoAccess,
+    private val output: TtyLayout,
 ): PackageManager {
     override suspend fun enabled(): Decision
     {
@@ -19,23 +21,23 @@ class Homebrew(
         }
     }
 
-    override suspend fun updateAll()
+    override suspend fun update()
     {
         val name = "Homebrew Updates"
 
         ShellCommand("brew update")
             .exec(capture = true)
-            .printCapturedLines(name)
+            .printCapturedLines(output, name)
             .awaitSuccess()
 
         ShellCommand("brew upgrade")
             .exec(capture = true)
-            .printCapturedLines(name)
+            .printCapturedLines(output, name)
             .awaitSuccess()
 
         ShellCommand("brew cleanup")
             .exec(capture = true)
-            .printCapturedLines(name)
+            .printCapturedLines(output, name)
             .awaitSuccess()
 
     }

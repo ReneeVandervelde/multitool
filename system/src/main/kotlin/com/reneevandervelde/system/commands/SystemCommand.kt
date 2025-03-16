@@ -11,6 +11,8 @@ import com.reneevandervelde.system.SystemModule
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.exceptions.ExceptionHandleResult
 import com.reneevandervelde.system.processes.ExitCode
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
@@ -24,6 +26,7 @@ abstract class SystemCommand: CliktCommand()
         )
     }
     val logger by lazy { module.formattedLogger }
+    val output by lazy { module.outputLayout }
     abstract val errors: List<DocumentedResult>
 
     final override fun helpEpilog(context: Context): String {
@@ -43,6 +46,10 @@ abstract class SystemCommand: CliktCommand()
     final override fun run()
     {
         runBlocking {
+            val renderJob = module.defaultScope.launch {
+                module.renderer.render(output)
+            }
+
             runCatching {
                 logger.trace("Beginning command execution of ${this@SystemCommand::class.simpleName}")
                 runCommand()
@@ -58,6 +65,9 @@ abstract class SystemCommand: CliktCommand()
                     }
                 }
             }
+
+            output.close()
+            renderJob.cancelAndJoin()
         }
     }
 

@@ -2,6 +2,8 @@ package com.reneevandervelde.system.processes
 
 import com.github.ajalt.mordant.rendering.TextColors
 import com.reneevandervelde.system.FormattedLogger
+import com.reneevandervelde.system.render.TtyLayout
+import com.reneevandervelde.system.render.println
 import kotlinx.coroutines.flow.*
 import java.io.File
 import kotlin.streams.asSequence
@@ -122,36 +124,14 @@ fun exec(
 val ProcessState.shortCommand: String get() = commandString.substringAfterLast('/').substringBefore(' ')
 
 fun Flow<ProcessState>.printCapturedLines(
+    output: TtyLayout,
     prefix: String? = null
 ): Flow<ProcessState> {
     return onEach { state ->
         when (state) {
             is ProcessState.Capturing -> {
                 val prefixString = TextColors.gray("${prefix?.let { "$it > " }.orEmpty()}${state.shortCommand}: ")
-                state.output.collect { println("$prefixString$it") }
-            }
-            else -> {}
-        }
-    }
-}
-
-fun Flow<ProcessState>.fenceOutput(logger: FormattedLogger): Flow<ProcessState>
-{
-    return onEach { state ->
-        when (state) {
-            is ProcessState.Prepared -> {
-                logger.blank()
-                logger.info("exec: ${state.commandString}")
-                logger.divider()
-            }
-            is ProcessState.Completed -> {
-                logger.divider()
-                logger.info("exit: ${state.exitCode}")
-                logger.blank()
-
-            }
-            is ProcessState.Error -> {
-                logger.divider()
+                state.output.collect { output.println("$prefixString$it") }
             }
             else -> {}
         }

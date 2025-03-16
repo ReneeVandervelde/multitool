@@ -1,13 +1,17 @@
 package com.reneevandervelde.system.commands.update
 
 import com.github.ajalt.clikt.core.Context
+import com.reneevandervelde.system.apps.toUpdateOperation
 import com.reneevandervelde.system.commands.SystemCommand
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.ShellCommand
 import com.reneevandervelde.system.processes.awaitSuccess
 import com.reneevandervelde.system.processes.exec
+import com.reneevandervelde.system.render.println
+import ink.ui.structures.TextStyle
 import kotlinx.coroutines.flow.first
+import kotlin.time.measureTime
 
 object UpdateCommand: SystemCommand()
 {
@@ -20,12 +24,15 @@ object UpdateCommand: SystemCommand()
 
     override suspend fun runCommand()
     {
-        ShellCommand("sudo -v").exec().awaitSuccess()
-        logger.info("Updating system...")
-        val settings = module.settings.systemSettings.first()
-        settings.createDirs()
+        output.println("System Updates", TextStyle.H1)
 
-        module.operationRunner.run(module.updateModule.operations)
-        logger.info("System updated")
+        val time = measureTime {
+            ShellCommand("sudo -v").exec().awaitSuccess()
+            val settings = module.settings.systemSettings.first()
+            settings.createDirs()
+
+            module.operationRunner.run(module.appsModule.updatables.map { it.toUpdateOperation() })
+        }
+        output.println("System updated (completed in $time)")
     }
 }
