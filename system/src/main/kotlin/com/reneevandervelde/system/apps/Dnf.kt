@@ -4,9 +4,11 @@ import com.reneevandervelde.system.info.OperatingSystem.Linux.Fedora
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.packagemanager.PackageManager
 import com.reneevandervelde.system.processes.*
+import com.reneevandervelde.system.render.TtyLayout
 
 class Dnf(
     private val systemInfoAccess: SystemInfoAccess,
+    private val output: TtyLayout,
 ): PackageManager {
     override suspend fun enabled(): Decision
     {
@@ -23,7 +25,7 @@ class Dnf(
     {
         ShellCommand("sudo dnf upgrade")
             .exec(capture = true)
-            .printCapturedLines("DNF Updates")
+            .printCapturedLines(output, "DNF Updates")
             .awaitSuccess()
     }
 }

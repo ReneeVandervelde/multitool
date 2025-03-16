@@ -9,6 +9,9 @@ import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.AppsModule
 import com.reneevandervelde.system.processes.OperationRunner
+import com.reneevandervelde.system.render.TerminalRenderer
+import com.reneevandervelde.system.render.TextRenderer
+import com.reneevandervelde.system.render.TtyLayout
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +29,7 @@ class SystemModule(
         isVerbose = isVerbose,
         clock = clock,
     )
+    val outputLayout = TtyLayout()
     private val logger: KimchiLogger = Kimchi.apply {
         addLog(logWriter)
     }
@@ -35,6 +39,7 @@ class SystemModule(
     )
     val settings = SettingsModule().settingsAccess
     val operationRunner = OperationRunner(
+        output = outputLayout,
         runScope = ioScope,
         logger = logger,
         clock = clock,
@@ -43,8 +48,17 @@ class SystemModule(
     val appsModule = AppsModule(
         systemInfoAccess = systemInfo,
         multitoolSettings = settings,
+        output = outputLayout,
         terminal = terminal,
         logger = logger,
+    )
+    val renderer = TerminalRenderer(
+        renderers = listOf(
+            TextRenderer(
+                terminal = terminal,
+                logger = logger,
+            )
+        ),
     )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(

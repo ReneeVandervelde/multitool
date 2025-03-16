@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.bundles.cli)
     implementation(libs.bundles.kotlin.extensions)
     implementation(libs.local.settings)
+    implementation(libs.ink.ui.structures)
 }
 
 tasks.register("install", Exec::class) {

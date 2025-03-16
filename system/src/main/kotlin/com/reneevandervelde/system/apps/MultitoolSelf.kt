@@ -7,11 +7,13 @@ import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.*
+import com.reneevandervelde.system.render.TtyLayout
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.first
 
 class MultitoolSelf(
     private val settings: MultitoolSettings,
+    private val output: TtyLayout,
     private val terminal: Terminal,
     private val logger: KimchiLogger,
 ): Updatable {
@@ -33,7 +35,7 @@ class MultitoolSelf(
 
         logger.info("Pulling latest changes from build repository")
         buildGitRepository.pull().exec(capture = true)
-            .printCapturedLines(updateName)
+            .printCapturedLines(output, updateName)
             .awaitSuccess()
         val updatedHash = buildGitRepository.getHash()
 
@@ -43,7 +45,7 @@ class MultitoolSelf(
         }
         logger.info("Installing latest version")
         exec("bin/gradlew system:install", workingDir = settings.multitoolBuildDir, capture = true)
-            .printCapturedLines(updateName)
+            .printCapturedLines(output, updateName)
             .awaitSuccess()
     }
 
@@ -52,16 +54,16 @@ class MultitoolSelf(
         logger.info("Cloning repo for build")
         GitRepository.clone("https://github.com/ReneeVandervelde/multitool.git", settings.multitoolBuildDir)
             .exec(capture = true)
-            .printCapturedLines(updateName)
+            .printCapturedLines(output, updateName)
             .awaitSuccess()
         val gitRepository = GitRepository(settings.multitoolBuildDir)
 
-        gitRepository.status().exec(capture = true).printCapturedLines(updateName).awaitSuccess()
+        gitRepository.status().exec(capture = true).printCapturedLines(output, updateName).awaitSuccess()
         gitRepository.log(
             count = 8,
             showSignature = true,
             format = "Commit: %H%nDate: %ai%n",
-        ).exec(capture = true).printCapturedLines(updateName).awaitSuccess()
+        ).exec(capture = true).printCapturedLines(output, updateName).awaitSuccess()
 
         val confirmation = terminal.prompt("Confirm repository signatures (Y/n)")
 

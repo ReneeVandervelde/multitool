@@ -121,6 +121,10 @@ module = "com.inkapplications.watermelon:datetime"
 version.ref = "ink-ui"
 module = "com.inkapplications.ui:render-compose-android"
 
+[libraries.ink-ui-structures]
+version.ref = "ink-ui"
+module = "com.inkapplications.ui:structures"
+
 [libraries.kimchi-core]
 version = "2.2.0"
 module = "com.inkapplications.kimchi:core"

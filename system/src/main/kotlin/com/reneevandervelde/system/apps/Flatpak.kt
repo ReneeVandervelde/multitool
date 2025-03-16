@@ -4,9 +4,11 @@ import com.reneevandervelde.system.info.OperatingSystem.Linux
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.packagemanager.PackageManager
 import com.reneevandervelde.system.processes.*
+import com.reneevandervelde.system.render.TtyLayout
 
 class Flatpak(
     private val systemInfoAccess: SystemInfoAccess,
+    private val output: TtyLayout,
 ): PackageManager {
     override suspend fun enabled(): Decision
     {
@@ -23,7 +25,7 @@ class Flatpak(
     {
         ShellCommand("flatpak update -y")
             .exec(capture = true)
-            .printCapturedLines("Flatpak Updates")
+            .printCapturedLines(output, "Flatpak Updates")
             .awaitSuccess()
     }
 }
