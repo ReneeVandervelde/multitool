@@ -1,8 +1,5 @@
 package com.reneevandervelde.system.render
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-
 class TerminalRenderer(
     renderers: List<ElementRenderer> = emptyList(),
 ) {

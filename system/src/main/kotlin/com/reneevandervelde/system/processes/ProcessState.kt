@@ -4,6 +4,7 @@ import com.github.ajalt.mordant.rendering.TextColors
 import com.reneevandervelde.system.FormattedLogger
 import com.reneevandervelde.system.render.TtyLayout
 import com.reneevandervelde.system.render.println
+import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.*
 import java.io.File
 import kotlin.streams.asSequence
@@ -138,6 +139,19 @@ fun Flow<ProcessState>.printCapturedLines(
     }
 }
 
+fun Flow<ProcessState>.logCapturedLines(
+    logger: KimchiLogger,
+): Flow<ProcessState> {
+    return onEach { state ->
+        when (state) {
+            is ProcessState.Capturing -> {
+                state.output.collect { logger.debug("${state.shortCommand}: ") }
+            }
+            else -> {}
+        }
+    }
+}
+
 suspend fun Flow<ProcessState>.awaitSuccess(): ProcessState.Success
 {
     return mapNotNull { state ->
@@ -149,6 +163,19 @@ suspend fun Flow<ProcessState>.awaitSuccess(): ProcessState.Success
                 throw RequiredProcessFailed(state)
             }
             is ProcessState.Success -> state
+            else -> null
+        }
+    }.single()
+}
+
+suspend fun Flow<ProcessState>.awaitCompletion(): ProcessState.Completed
+{
+    return mapNotNull { state ->
+        when (state) {
+            is ProcessState.Error -> {
+                throw ProcessError(state)
+            }
+            is ProcessState.Completed -> state
             else -> null
         }
     }.single()
