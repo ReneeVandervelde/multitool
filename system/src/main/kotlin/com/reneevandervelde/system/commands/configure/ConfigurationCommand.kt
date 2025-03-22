@@ -47,11 +47,13 @@ object ConfigurationCommand: SystemCommand()
                     }
                 ))
             }
+            Verb.Configure -> configurationClass.configure()
         }
     }
 
     enum class Verb
     {
         Status,
+        Configure,
     }
 }

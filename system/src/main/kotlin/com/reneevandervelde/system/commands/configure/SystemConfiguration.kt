@@ -4,4 +4,5 @@ interface SystemConfiguration
 {
     val id: String
     suspend fun getStatus(): ConfigurationStatus
+    suspend fun configure()
 }
