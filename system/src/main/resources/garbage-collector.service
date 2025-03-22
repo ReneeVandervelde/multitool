@@ -1,0 +1,9 @@
+[Unit]
+Description=Garbage Collector
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -l -c 'exec "$@"' _ garbage-collector
+
+[Install]
+WantedBy=default.target

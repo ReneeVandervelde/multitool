@@ -20,6 +20,10 @@ class AppsModule(
         terminal = terminal,
         logger = logger,
     )
+    val systemCtl = SystemCtl(
+        systemInfoAccess = systemInfoAccess,
+        logger = logger,
+    )
 
     val packageManagers: Set<PackageManager> = setOf(
         Dnf(systemInfoAccess, output),

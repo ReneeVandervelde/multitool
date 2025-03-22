@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+echo "# Garbage collector";
+
+echo "## Removing Downloads older than 3 days";
+find $HOME/Downloads -mindepth 1 -name "*" -ctime +3 -print -exec trash "{}" \;
+
+if [ -d $HOME/Desktop ]; then
+    echo "## Removing Desktop Junk";
+    find $HOME/Desktop -mindepth 1 -name "*" -print -exec trash "{}" \;
+fi
+
+if [ -d $HOME/Pictures/Screenshots ]; then
+    echo "## Removing Screenshots older than 3 days"
+    find $HOME/Pictures/Screenshots -mindepth 1 -name "*" -ctime +3 -print -exec trash "{}" \;
+fi

@@ -3,12 +3,14 @@ package com.reneevandervelde.system
 import com.github.ajalt.mordant.terminal.Terminal
 import com.inkapplications.datetime.ZonedClock
 import com.reneevandervelde.settings.SettingsModule
+import com.reneevandervelde.system.commands.configure.ConfigurationModule
 import com.reneevandervelde.system.exceptions.CompositeExceptionHandler
 import com.reneevandervelde.system.exceptions.ExceptionHandler
 import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.AppsModule
 import com.reneevandervelde.system.processes.OperationRunner
+import com.reneevandervelde.system.render.StatusRenderer
 import com.reneevandervelde.system.render.TerminalRenderer
 import com.reneevandervelde.system.render.TextRenderer
 import com.reneevandervelde.system.render.TtyLayout
@@ -52,12 +54,19 @@ class SystemModule(
         terminal = terminal,
         logger = logger,
     )
+    val configurationModule = ConfigurationModule(
+        systemCtl = appsModule.systemCtl
+    )
     val renderer = TerminalRenderer(
         renderers = listOf(
             TextRenderer(
                 terminal = terminal,
                 logger = logger,
-            )
+            ),
+            StatusRenderer(
+                terminal = terminal,
+                logger = logger,
+            ),
         ),
     )
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
