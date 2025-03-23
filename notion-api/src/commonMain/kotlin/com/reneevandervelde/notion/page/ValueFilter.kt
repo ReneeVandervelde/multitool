@@ -13,6 +13,10 @@ sealed interface ValueFilter
         val contains: String,
     ): ValueFilter
 
+    data class Equals(
+        val value: String,
+    ): ValueFilter
+
     data class DoesNotEqual(
         val value: String,
     ): ValueFilter
@@ -34,6 +38,9 @@ internal class FilterQuerySerializer: KSerializer<ValueFilter>
             is ValueFilter.Contains -> Surrogate(
                 contains = value.contains,
             )
+            is ValueFilter.Equals -> Surrogate(
+                equals = value.value,
+            )
             is ValueFilter.DoesNotEqual -> Surrogate(
                 does_not_equal = value.value,
             )
@@ -50,6 +57,7 @@ internal class FilterQuerySerializer: KSerializer<ValueFilter>
     @Serializable
     private data class Surrogate(
         val contains: String? = null,
+        val equals: String? = null,
         val does_not_equal: String? = null,
         val is_empty: Boolean? = null,
         val is_not_empty: Boolean? = null,

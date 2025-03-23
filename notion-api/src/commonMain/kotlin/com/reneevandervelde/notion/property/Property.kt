@@ -77,6 +77,11 @@ sealed interface Property
         val value: Boolean,
     ): Property
 
+    data class TextFormula(
+        override val id: PropertyId,
+        val value: String,
+    ): Property
+
     data class Checkbox(
         override val id: PropertyId,
         val value: Boolean,
@@ -139,6 +144,10 @@ internal class PropertySerializer: KSerializer<Property>
                 Surrogate.FormulaType.Boolean -> Property.BooleanFormula(
                     id = surrogate.id,
                     value = surrogate.formula.boolean ?: error("boolean formula must be present")
+                )
+                Surrogate.FormulaType.String -> Property.TextFormula(
+                    id = surrogate.id,
+                    value = surrogate.formula.string ?: error("string formula must be present")
                 )
                 else -> Property.UnknownPropertyType(
                     id = surrogate.id,
