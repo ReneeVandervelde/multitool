@@ -17,7 +17,11 @@ class TasksViewAccess(
             ScrollingListLayout(
                 TextElement("All Tasks", TextStyle.H1),
                 *tasks.map {
-                    TaskRowElement(it)
+                    TaskRowElement(
+                        task = it,
+                        completeTask = { taskData.markDone(it.page.id) },
+                        resetTask = { taskData.markNotStarted(it.page.id) },
+                    )
                 }.toTypedArray()
             )
         } else {

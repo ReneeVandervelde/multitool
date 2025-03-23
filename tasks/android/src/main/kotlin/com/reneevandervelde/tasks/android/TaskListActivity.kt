@@ -3,14 +3,11 @@ package com.reneevandervelde.tasks.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Row
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import com.reneevandervelde.tasks.ManagementModule
 import com.reneevandervelde.tasks.NotionConfigDatabase
-import com.reneevandervelde.tasks.TaskPage
 import ink.ui.render.compose.ComposeRenderer
 import ink.ui.render.compose.theme.defaultTheme
 import ink.ui.structures.elements.ButtonElement
@@ -29,7 +26,7 @@ class TaskListActivity: ComponentActivity()
         val settingsModule = AndroidSettingsModule(
             context = this,
         )
-        val module = ManagementModule(
+        val managementModule = ManagementModule(
             configAccess = NotionConfigDatabase(
                 settings = settingsModule.settingsAccess,
             )
@@ -43,7 +40,7 @@ class TaskListActivity: ComponentActivity()
                     TaskRowElementRenderer,
                 )
             )
-            val state by module.view.viewState.collectAsState(null)
+            val state by managementModule.view.viewState.collectAsState(null)
             if (state == null) {
                 NotionConfigDatabase.Settings.all
                     .map {

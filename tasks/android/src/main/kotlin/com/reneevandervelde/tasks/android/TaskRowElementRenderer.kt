@@ -22,9 +22,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.reneevandervelde.notion.page.PageIcon
 import com.reneevandervelde.tasks.TaskRowElement
 import ink.ui.render.compose.renderer.ElementRenderer
@@ -39,8 +37,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
-object TaskRowElementRenderer: ElementRenderer
-{
+private enum class States {
+    Todo,
+    Completing,
+    Completed,
+    Resetting,
+}
+
+object TaskRowElementRenderer: ElementRenderer {
     @Composable
     override fun render(
         element: UiElement,
@@ -48,6 +52,21 @@ object TaskRowElementRenderer: ElementRenderer
         parent: ElementRenderer
     ): RenderResult {
         if (element !is TaskRowElement) return RenderResult.Skipped
+        var state by remember { mutableStateOf(States.Todo) }
+        println(state)
+        when (state) {
+            States.Completing -> LaunchedEffect("complete-${element.task.page.id}", state) {
+                println("Completing")
+                element.completeTask()
+                state = States.Completed
+            }
+            States.Resetting -> LaunchedEffect("reset-${element.task.page.id}", state) {
+                println("Resetting")
+                element.resetTask()
+                state = States.Todo
+            }
+            else -> {}
+        }
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -66,11 +85,19 @@ object TaskRowElementRenderer: ElementRenderer
             Button(
                 text = "",
                 leadingSymbol = Symbol.Done,
-                sentiment = Sentiment.Positive,
+                sentiment = when (state) {
+                    States.Todo -> Sentiment.Nominal
+                    States.Completed -> Sentiment.Positive
+                    States.Completing, States.Resetting -> Sentiment.Idle
+                },
                 theme = theme,
                 onLongClick = {
-                    println("WE DID IT")
-                }
+                    when (state) {
+                        States.Todo ->  state = States.Completing
+                        States.Completed -> state = States.Resetting
+                        else -> {}
+                    }
+                }.takeIf { state in setOf(States.Todo, States.Completed) },
             )
         }
 
@@ -88,7 +115,7 @@ private fun Button(
     trailingSymbol: Symbol? = null,
     theme: ComposeRenderTheme,
     onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
     buttonModifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
 ) {
@@ -127,13 +154,15 @@ private fun Button(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
-                        animationJob?.cancel()
-                        animationJob = scope.launch {
-                            backgroundColor.snapTo(theme.colors.surfaceInteraction)
-                            backgroundColor.animateTo(theme.colors.surface.copy(), tween(300))
+                        onLongClick?.run {
+                            animationJob?.cancel()
+                            animationJob = scope.launch {
+                                backgroundColor.snapTo(theme.colors.surfaceInteraction)
+                                backgroundColor.animateTo(theme.colors.surface.copy(), tween(300))
+                            }
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            invoke()
                         }
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onLongClick()
                     },
                 )
             }
