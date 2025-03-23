@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface TaskDataAccess
 {
-    val latestTasks: Flow<List<TaskPage>>
+    val latestTasks: Flow<List<TaskPage>?>
 }

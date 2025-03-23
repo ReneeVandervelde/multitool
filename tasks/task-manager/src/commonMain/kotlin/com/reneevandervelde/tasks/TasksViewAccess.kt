@@ -13,9 +13,9 @@ class TasksViewAccess(
     val viewState: Flow<UiLayout> = taskData.latestTasks.map { tasks ->
         ScrollingListLayout(
             TextElement("All Tasks", TextStyle.H1),
-            *tasks.map {
+            *tasks?.map {
                 TaskRowElement(it)
-            }.toTypedArray()
+            }.orEmpty().toTypedArray()
         )
     }
 }
