@@ -6,6 +6,7 @@ import com.reneevandervelde.notion.database.DatabaseId
 import com.reneevandervelde.notion.database.DatabaseQuery
 import com.reneevandervelde.notion.page.PageFilter
 import com.reneevandervelde.notion.page.PageId
+import com.reneevandervelde.notion.page.TextFilter
 import com.reneevandervelde.notion.page.ValueFilter
 import com.reneevandervelde.notion.property.PropertyArgument
 import com.reneevandervelde.notion.property.StatusArgument
@@ -36,9 +37,31 @@ class CachedTaskDataAccess(
                     token = cache.apiKey,
                     database = cache.databaseId,
                     query = DatabaseQuery(
-                        filter = PageFilter.Status(
-                            property = TaskPage.Properties.Complete,
-                            filter = ValueFilter.Equals("Not started"),
+                        filter = PageFilter.And(
+                            PageFilter.Or(
+                                PageFilter.Status(
+                                    property = TaskPage.Properties.Complete,
+                                    filter = ValueFilter.Equals("Not started"),
+                                ),
+                                PageFilter.Status(
+                                    property = TaskPage.Properties.Complete,
+                                    filter = ValueFilter.Equals("In progress"),
+                                ),
+                            ),
+                            PageFilter.Or(
+                                PageFilter.Text(
+                                    property = TaskPage.Properties.Timeframe,
+                                    filter = TextFilter.Contains("Overdue"),
+                                ),
+                                PageFilter.Text(
+                                    property = TaskPage.Properties.Timeframe,
+                                    filter = TextFilter.Contains("Today"),
+                                ),
+                                PageFilter.Text(
+                                    property = TaskPage.Properties.Timeframe,
+                                    filter = TextFilter.Contains("Ready"),
+                                ),
+                            )
                         )
                     )
                 ).map { TaskPage(it) }.also {
