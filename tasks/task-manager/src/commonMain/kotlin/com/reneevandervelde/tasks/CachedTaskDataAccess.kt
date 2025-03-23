@@ -17,7 +17,7 @@ class CachedTaskDataAccess(
     private val databaseId = notionConfigAccess.databaseId.filterNotNull()
     private val latestCache: MutableStateFlow<TasksCache?> = MutableStateFlow(null)
 
-    override val latestTasks: Flow<List<TaskPage>> = combine(apiKey, databaseId, latestCache) { apiKey, database, cache ->
+    override val latestTasks: Flow<List<TaskPage>?> = combine(apiKey, databaseId, latestCache) { apiKey, database, cache ->
         TasksCache(
             apiKey = apiKey,
             databaseId = database,
@@ -25,22 +25,27 @@ class CachedTaskDataAccess(
                 cache.apiKey == apiKey && cache.databaseId == database
             },
         )
-    }.mapLatest { cache ->
-        cache.result ?: notionApi.queryDatabaseForAll(
-            token = cache.apiKey,
-            database = cache.databaseId,
-            query = DatabaseQuery(
-                filter = PageFilter.Status(
-                    property = TaskPage.Properties.Complete,
-                    filter = ValueFilter.Equals("Not started"),
-                )
-            )
-        ).map { TaskPage(it) }.also {
-            latestCache.value = cache.copy(
-                result = it,
-            )
+    }.flatMapLatest { cache ->
+        flow {
+            emit(cache.result)
+            if (cache.result == null) {
+                notionApi.queryDatabaseForAll(
+                    token = cache.apiKey,
+                    database = cache.databaseId,
+                    query = DatabaseQuery(
+                        filter = PageFilter.Status(
+                            property = TaskPage.Properties.Complete,
+                            filter = ValueFilter.Equals("Not started"),
+                        )
+                    )
+                ).map { TaskPage(it) }.also {
+                    latestCache.value = cache.copy(
+                        result = it,
+                    )
+                }
+            }
         }
-    }
+    }.distinctUntilChanged()
 }
 
 private data class TasksCache(
