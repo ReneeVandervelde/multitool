@@ -9,7 +9,7 @@ kotlin {
         commonMain.dependencies {
             api(libs.kotlin.coroutines.core)
             api(libs.ink.ui.structures)
-            implementation(libs.local.notion)
+            api(libs.local.notion)
             implementation(libs.regolith.data)
         }
     }

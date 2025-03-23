@@ -54,5 +54,6 @@ dependencies {
     implementation(libs.regolith.processes)
     implementation(compose.runtime)
     implementation(compose.foundation)
+    implementation(compose.components.resources)
     implementation(project(":task-manager"))
 }
