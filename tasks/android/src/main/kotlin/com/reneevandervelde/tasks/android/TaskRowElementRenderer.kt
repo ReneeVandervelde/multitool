@@ -79,7 +79,9 @@ object TaskRowElementRenderer: ElementRenderer {
             )
             BasicText(
                 text = element.task.title,
-                style = theme.typography.body,
+                style = theme.typography.body.copy(
+                    color = theme.colors.foreground,
+                ),
                 modifier = Modifier.weight(1f, true).padding(start = theme.spacing.item)
             )
             Button(
