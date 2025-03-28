@@ -44,7 +44,7 @@ class MultitoolSelf(
             return
         }
         logger.info("Installing latest version")
-        exec("bin/gradlew system:install", workingDir = settings.multitoolBuildDir, capture = true)
+        exec("bin/gradlew", "system:install", workingDir = settings.multitoolBuildDir, capture = true)
             .printCapturedLines(output, updateName)
             .awaitSuccess()
     }
