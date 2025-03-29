@@ -1,0 +1,22 @@
+# Log Files
+*.log
+
+# Android Studio Navigation editor temp files
+.navigation/
+
+# Android Studio captures folder
+captures/
+
+# Intellij
+*.iml
+.idea/
+
+# Fleet
+.fleet/
+
+# System
+.DS_Store
+project-bin/
+
+# Java
+*.hprof

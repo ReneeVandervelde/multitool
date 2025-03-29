@@ -5,6 +5,7 @@ import com.reneevandervelde.system.commands.configure.SystemConfiguration
 import com.reneevandervelde.system.info.OperatingSystem
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.Decision
+import java.io.File
 
 class UsbGuardMonitor(
     private val systemCtl: SystemCtl,
@@ -34,7 +35,7 @@ class UsbGuardMonitor(
     override suspend fun configure()
     {
         val resource = javaClass.getResourceAsStream("/usbguard-monitor.service")
-        val tempFile = java.io.File.createTempFile("usbguard-monitor", ".service")
+        val tempFile = File.createTempFile("usbguard-monitor", ".service")
         tempFile.outputStream().use {
             resource.copyTo(it)
         }

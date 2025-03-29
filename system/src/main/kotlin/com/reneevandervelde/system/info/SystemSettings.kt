@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.File
 
-class SystemSettings(
-) {
+class SystemSettings
+{
     val hostBinDir = File(System.getProperty("user.home"), ".local/bin")
     val hostBashProfile = File(System.getProperty("user.home"), ".bash_profile")
     val hostLibDir = File(System.getProperty("user.home"), ".local/share")
