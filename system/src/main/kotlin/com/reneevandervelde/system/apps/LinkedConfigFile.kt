@@ -30,7 +30,7 @@ abstract class LinkedConfigFile(
     {
         archiveSystemFile()
         logger.debug("Creating symlink: ${getSystemFile().absolutePath} -> ${getSourceFile().absolutePath}")
-        Files.createSymbolicLink(getSourceFile().toPath(), getSystemFile().toPath())
+        Files.createSymbolicLink(getSystemFile().toPath(), getSourceFile().toPath())
     }
 
     private suspend fun archiveSystemFile()
