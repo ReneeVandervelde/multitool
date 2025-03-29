@@ -55,7 +55,11 @@ class SystemModule(
         logger = logger,
     )
     val configurationModule = ConfigurationModule(
-        systemCtl = appsModule.systemCtl
+        systemCtl = appsModule.systemCtl,
+        systemInfo = systemInfo,
+        settings = settings,
+        clock = clock,
+        logger = logger,
     )
     val renderer = TerminalRenderer(
         renderers = listOf(

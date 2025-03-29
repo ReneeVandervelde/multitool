@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Main loop
+prompted_devices=()
+
+# Function to check if a device ID has been prompted before
+is_prompted() {
+    local id="$1"
+    for prompted_id in "${prompted_devices[@]}"; do
+        if [ "$id" == "$prompted_id" ]; then
+            return 0  # Already prompted
+        fi
+    done
+    return 1  # Not prompted
+}
+
+# Function to handle the notification
+handle_notification() {
+    local id="$1"
+    local name="$2"
+    local action="$3"
+
+    if [ "$action" == "allow" ]; then
+        echo "Allowing device: $id"
+        usbguard allow-device "$id"
+    fi
+
+    # Remove ID from prompted devices
+    prompted_devices=("${prompted_devices[@]/$id}")
+}
+
+handle_device_prompt() {
+    local id="$1"
+    local name="$2"
+
+    # Show notification with device name in the title
+    action_index=$(notify-send "Blocked device: $name" "Do you want to allow the device?" \
+        --action="Allow" --action="Dismiss" \
+        --urgency=normal \
+        --expire-time=0
+    )
+
+    # Handle the notification based on the user's action
+    case "$action_index" in
+        0)  handle_notification "$id" "$name" "allow" ;;
+        1)  # Dismissed or blocked (no action needed)
+            ;;
+        *)  echo "Unknown action index: $action_index"
+            ;;
+    esac
+}
+
+while true; do
+    echo "check"
+    # Get the list of blocked devices
+    blocked_devices=$(usbguard list-devices --blocked)
+
+    # Check for new blocked
+    if [ -n "$blocked_devices" ]; then
+        while read -r line; do
+            # Extract device ID and name from the line
+            id=$(echo "$line" | awk '{print $1}' | tr -d ':')
+            name=$(echo "$line" | grep -o 'name "[^"]*"' | cut -d'"' -f2)
+
+            # Check if the device has been prompted before
+            if ! is_prompted "$id"; then
+                prompted_devices+=("$id")
+                handle_device_prompt $id $name &
+            fi
+        done <<< "$blocked_devices"
+    fi
+
+    # Sleep for 5 seconds before checking again
+    sleep 5
+done

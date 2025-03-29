@@ -1,0 +1,11 @@
+[user]
+    name = Renee Vandervelde
+    email = "Renee@ReneeVandervelde.com"
+    signingkey = "1E3B6A09031AACF4"
+[core]
+    excludesfile = ~/.gitignore
+    editor = /usr/bin/env vi
+[commit]
+    gpgsign = true
+[color]
+    ui = auto
