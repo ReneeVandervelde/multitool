@@ -147,6 +147,10 @@ module = "org.slf4j:slf4j-nop"
 version = "5.0.2"
 module = "com.github.ajalt.clikt:clikt"
 
+[libraries.apache-commons-compress]
+version = "1.27.1"
+module = "org.apache.commons:commons-compress"
+
 ##
 # Bundles
 ##

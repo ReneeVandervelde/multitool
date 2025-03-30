@@ -5,6 +5,8 @@ import com.reneevandervelde.settings.MultitoolSettings
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.packagemanager.PackageManager
 import com.reneevandervelde.system.render.TtyLayout
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import kimchi.logger.KimchiLogger
 
 class AppsModule(
