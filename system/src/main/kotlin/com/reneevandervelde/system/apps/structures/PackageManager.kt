@@ -1,7 +1,4 @@
-package com.reneevandervelde.system.apps.packagemanager
-
-import com.reneevandervelde.system.apps.App
-import com.reneevandervelde.system.apps.Updatable
+package com.reneevandervelde.system.apps.structures
 
 interface PackageManager: App, Updatable
 {

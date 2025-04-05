@@ -1,4 +1,4 @@
-package com.reneevandervelde.system.apps
+package com.reneevandervelde.system.apps.structures
 
 import io.ktor.client.*
 import io.ktor.client.request.*

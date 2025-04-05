@@ -1,6 +1,10 @@
 package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.settings.MultitoolSettings
+import com.reneevandervelde.system.apps.structures.App
+import com.reneevandervelde.system.apps.structures.BinaryUpdater
+import com.reneevandervelde.system.apps.structures.LockFile
+import com.reneevandervelde.system.apps.structures.Updatable
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.Decision
 import io.ktor.client.*
