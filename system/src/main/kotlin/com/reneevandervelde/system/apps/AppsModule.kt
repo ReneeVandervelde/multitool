@@ -26,6 +26,11 @@ class AppsModule(
         systemInfoAccess = systemInfoAccess,
         logger = logger,
     )
+    val resilioSync = ResilioSync(
+        settings = multitoolSettings,
+        logger = logger,
+        httpClient = HttpClient(CIO),
+    )
 
     val packageManagers: Set<PackageManager> = setOf(
         Dnf(systemInfoAccess, output),
@@ -39,5 +44,6 @@ class AppsModule(
     val updatables: Set<Updatable> = setOf(
         multitoolSelf,
         *packageManagers.toTypedArray(),
+        resilioSync,
     )
 }
