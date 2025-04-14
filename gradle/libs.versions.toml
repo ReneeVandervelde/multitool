@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.10"
 ktor = "3.1.1"
-coroutines = "1.10.1"
+coroutines = "1.10.2"
 ink-ui = "1.1.0"
 regolith = "1.6.0"
 watermelon = "1.9.0"
