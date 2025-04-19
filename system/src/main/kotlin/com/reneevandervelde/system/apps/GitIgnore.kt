@@ -1,6 +1,7 @@
 package com.reneevandervelde.system.apps
 
 import com.reneevandervelde.settings.MultitoolSettings
+import com.reneevandervelde.system.apps.structures.LinkedConfigFile
 import com.reneevandervelde.system.commands.configure.SystemConfiguration
 import com.reneevandervelde.system.info.systemSettings
 import kimchi.logger.KimchiLogger

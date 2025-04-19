@@ -17,6 +17,8 @@ dependencies {
     implementation(libs.bundles.kotlin.extensions)
     implementation(libs.local.settings)
     implementation(libs.ink.ui.structures)
+    implementation(libs.bundles.ktor.client)
+    implementation(libs.apache.commons.compress)
 }
 
 tasks.register("install", Exec::class) {

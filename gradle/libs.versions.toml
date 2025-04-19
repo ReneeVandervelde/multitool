@@ -41,7 +41,7 @@ version.ref = "kotlin"
 id = "org.jetbrains.kotlin.plugin.serialization"
 
 [plugins.android-application]
-version = "8.8.0-alpha05"
+version = "8.8.0"
 id = "com.android.application"
 
 [plugins.jetbrains-compose]
@@ -146,6 +146,10 @@ module = "org.slf4j:slf4j-nop"
 [libraries.clikt]
 version = "5.0.2"
 module = "com.github.ajalt.clikt:clikt"
+
+[libraries.apache-commons-compress]
+version = "1.27.1"
+module = "org.apache.commons:commons-compress"
 
 ##
 # Bundles

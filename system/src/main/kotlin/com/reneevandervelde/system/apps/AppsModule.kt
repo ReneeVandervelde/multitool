@@ -3,8 +3,11 @@ package com.reneevandervelde.system.apps
 import com.github.ajalt.mordant.terminal.Terminal
 import com.reneevandervelde.settings.MultitoolSettings
 import com.reneevandervelde.system.info.SystemInfoAccess
-import com.reneevandervelde.system.apps.packagemanager.PackageManager
+import com.reneevandervelde.system.apps.structures.PackageManager
+import com.reneevandervelde.system.apps.structures.Updatable
 import com.reneevandervelde.system.render.TtyLayout
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import kimchi.logger.KimchiLogger
 
 class AppsModule(
@@ -24,6 +27,11 @@ class AppsModule(
         systemInfoAccess = systemInfoAccess,
         logger = logger,
     )
+    val resilioSync = ResilioSync(
+        settings = multitoolSettings,
+        logger = logger,
+        httpClient = HttpClient(CIO),
+    )
 
     val packageManagers: Set<PackageManager> = setOf(
         Dnf(systemInfoAccess, output),
@@ -37,5 +45,6 @@ class AppsModule(
     val updatables: Set<Updatable> = setOf(
         multitoolSelf,
         *packageManagers.toTypedArray(),
+        resilioSync,
     )
 }

@@ -3,6 +3,7 @@ package com.reneevandervelde.system.apps
 import com.github.ajalt.mordant.terminal.Terminal
 import com.github.ajalt.mordant.terminal.prompt
 import com.reneevandervelde.settings.MultitoolSettings
+import com.reneevandervelde.system.apps.structures.Updatable
 import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.info.systemSettings

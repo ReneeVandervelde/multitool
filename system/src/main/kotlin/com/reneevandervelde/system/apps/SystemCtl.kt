@@ -1,5 +1,6 @@
 package com.reneevandervelde.system.apps
 
+import com.reneevandervelde.system.apps.structures.App
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.processes.*
 import kimchi.logger.KimchiLogger

@@ -1,7 +1,7 @@
 package com.reneevandervelde.system.commands.update
 
 import com.github.ajalt.clikt.core.Context
-import com.reneevandervelde.system.apps.toUpdateOperation
+import com.reneevandervelde.system.apps.structures.toUpdateOperation
 import com.reneevandervelde.system.commands.SystemCommand
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.info.systemSettings

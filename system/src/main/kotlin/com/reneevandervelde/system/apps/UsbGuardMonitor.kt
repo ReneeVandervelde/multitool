@@ -1,5 +1,6 @@
 package com.reneevandervelde.system.apps
 
+import com.reneevandervelde.system.apps.structures.App
 import com.reneevandervelde.system.commands.configure.ConfigurationStatus
 import com.reneevandervelde.system.commands.configure.SystemConfiguration
 import com.reneevandervelde.system.info.OperatingSystem
