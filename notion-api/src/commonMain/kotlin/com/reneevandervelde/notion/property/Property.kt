@@ -1,6 +1,5 @@
 package com.reneevandervelde.notion.property
 
-import com.reneevandervelde.notion.page.Page
 import com.reneevandervelde.notion.page.PageId
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.KSerializer
@@ -43,7 +42,9 @@ sealed interface Property
         override val id: PropertyId,
         val start: String?,
     ): Property {
-        fun toLocalDate() = start?.let(LocalDate::parse)
+        fun toLocalDate() = start
+            ?.substringBefore('T')
+            ?.let(LocalDate::parse)
     }
 
     data class Number(
