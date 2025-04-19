@@ -148,7 +148,7 @@ internal class PropertySerializer: KSerializer<Property>
                 )
                 Surrogate.FormulaType.String -> Property.TextFormula(
                     id = surrogate.id,
-                    value = surrogate.formula.string ?: error("string formula must be present")
+                    value = surrogate.formula.string.orEmpty()
                 )
                 else -> Property.UnknownPropertyType(
                     id = surrogate.id,
