@@ -1,10 +1,17 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.reneevandervelde.tasks.android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.reneevandervelde.tasks.ManagementModule
 import com.reneevandervelde.tasks.NotionConfigDatabase
@@ -67,9 +74,16 @@ class TaskListActivity: ComponentActivity()
                         )
                     }
             } else {
-                renderer.render(
-                    uiLayout = state ?: ScrollingListLayout()
-                )
+                PullToRefreshBox(
+                    isRefreshing = false,
+                    onRefresh = {
+                        managementModule.view.refresh()
+                    },
+                ) {
+                    renderer.render(
+                        uiLayout = state ?: ScrollingListLayout()
+                    )
+                }
             }
         }
     }
