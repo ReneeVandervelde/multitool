@@ -12,6 +12,8 @@ import ink.ui.render.compose.ComposeRenderer
 import ink.ui.render.compose.theme.defaultTheme
 import ink.ui.structures.elements.ButtonElement
 import ink.ui.structures.layouts.ScrollingListLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -29,7 +31,8 @@ class TaskListActivity: ComponentActivity()
         val managementModule = ManagementModule(
             configAccess = NotionConfigDatabase(
                 settings = settingsModule.settingsAccess,
-            )
+            ),
+            ioScope = CoroutineScope(Dispatchers.IO),
         )
 
         setContent {

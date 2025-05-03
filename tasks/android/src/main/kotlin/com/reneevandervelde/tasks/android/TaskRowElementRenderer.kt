@@ -37,13 +37,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
-private enum class States {
-    Todo,
-    Completing,
-    Completed,
-    Resetting,
-}
-
 object TaskRowElementRenderer: ElementRenderer {
     @Composable
     override fun render(
@@ -52,21 +45,6 @@ object TaskRowElementRenderer: ElementRenderer {
         parent: ElementRenderer
     ): RenderResult {
         if (element !is TaskRowElement) return RenderResult.Skipped
-        var state by remember { mutableStateOf(States.Todo) }
-        println(state)
-        when (state) {
-            States.Completing -> LaunchedEffect("complete-${element.task.page.id}", state) {
-                println("Completing")
-                element.completeTask()
-                state = States.Completed
-            }
-            States.Resetting -> LaunchedEffect("reset-${element.task.page.id}", state) {
-                println("Resetting")
-                element.resetTask()
-                state = States.Todo
-            }
-            else -> {}
-        }
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -87,19 +65,17 @@ object TaskRowElementRenderer: ElementRenderer {
             Button(
                 text = "",
                 leadingSymbol = Symbol.Done,
-                sentiment = when (state) {
-                    States.Todo -> Sentiment.Nominal
-                    States.Completed -> Sentiment.Positive
-                    States.Completing, States.Resetting -> Sentiment.Idle
+                sentiment = when (element.displayState) {
+                    TaskRowElement.State.Todo -> Sentiment.Nominal
+                    TaskRowElement.State.Completed -> Sentiment.Positive
+                    TaskRowElement.State.Completing, TaskRowElement.State.Resetting -> Sentiment.Idle
                 },
                 theme = theme,
-                onLongClick = {
-                    when (state) {
-                        States.Todo ->  state = States.Completing
-                        States.Completed -> state = States.Resetting
-                        else -> {}
-                    }
-                }.takeIf { state in setOf(States.Todo, States.Completed) },
+                onLongClick = when (element.displayState) {
+                    TaskRowElement.State.Todo -> ({ element.completeTask() })
+                    TaskRowElement.State.Completed -> ({ element.resetTask() })
+                    else -> null
+                },
             )
         }
 
@@ -153,7 +129,7 @@ private fun Button(
                     latchingClick()
                 }
             )}
-            .pointerInput(Unit) {
+            .pointerInput(onLongClick) {
                 detectTapGestures(
                     onLongPress = {
                         onLongClick?.run {
