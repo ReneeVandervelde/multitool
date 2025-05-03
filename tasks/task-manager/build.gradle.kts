@@ -11,6 +11,7 @@ kotlin {
             api(libs.ink.ui.structures)
             api(libs.local.notion)
             implementation(libs.regolith.data)
+            implementation(libs.watermelon.coroutines)
         }
     }
 }
