@@ -8,4 +8,5 @@ interface TaskDataAccess
     val latestTasks: Flow<List<TaskPage>?>
     suspend fun markDone(task: PageId)
     suspend fun markNotStarted(task: PageId)
+    fun refresh()
 }

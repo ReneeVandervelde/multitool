@@ -19,10 +19,17 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class TasksViewAccess(
-    taskData: TaskDataAccess,
+    private val taskData: TaskDataAccess,
     actionScope: CoroutineScope,
 ) {
     private val stateCache = MutableStateFlow<Map<PageId, TaskRowElement.State>>(emptyMap())
+
+    fun refresh()
+    {
+        stateCache.value = emptyMap()
+        taskData.refresh()
+    }
+
     val viewState: Flow<UiLayout> = stateCache.combinePair(taskData.latestTasks).map { (cache, tasks) ->
         if (tasks != null) {
             ScrollingListLayout(
