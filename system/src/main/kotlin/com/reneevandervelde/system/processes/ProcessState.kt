@@ -1,9 +1,8 @@
 package com.reneevandervelde.system.processes
 
 import com.github.ajalt.mordant.rendering.TextColors
-import com.reneevandervelde.system.FormattedLogger
-import com.reneevandervelde.system.render.TtyLayout
-import com.reneevandervelde.system.render.println
+import ink.ui.structures.elements.StackElement
+import ink.ui.structures.elements.println
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.*
 import java.io.File
@@ -125,7 +124,7 @@ fun exec(
 val ProcessState.shortCommand: String get() = commandString.substringAfterLast('/').substringBefore(' ')
 
 fun Flow<ProcessState>.printCapturedLines(
-    output: TtyLayout,
+    output: StackElement,
     prefix: String? = null
 ): Flow<ProcessState> {
     return onEach { state ->

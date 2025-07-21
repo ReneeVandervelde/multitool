@@ -8,8 +8,8 @@ import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.ShellCommand
 import com.reneevandervelde.system.processes.awaitSuccess
 import com.reneevandervelde.system.processes.exec
-import com.reneevandervelde.system.render.println
 import ink.ui.structures.TextStyle
+import ink.ui.structures.elements.println
 import kotlinx.coroutines.flow.first
 import kotlin.time.measureTime
 

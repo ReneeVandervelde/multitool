@@ -10,10 +10,8 @@ import com.reneevandervelde.system.exceptions.SimpleErrorHandler
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.AppsModule
 import com.reneevandervelde.system.processes.OperationRunner
-import com.reneevandervelde.system.render.StatusRenderer
-import com.reneevandervelde.system.render.TerminalRenderer
-import com.reneevandervelde.system.render.TextRenderer
-import com.reneevandervelde.system.render.TtyLayout
+import ink.ui.render.terminal.TerminalPresenter
+import ink.ui.structures.elements.StackElement
 import kimchi.Kimchi
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +29,7 @@ class SystemModule(
         isVerbose = isVerbose,
         clock = clock,
     )
-    val outputLayout = TtyLayout()
+    val outputElement = StackElement()
     private val logger: KimchiLogger = Kimchi.apply {
         addLog(logWriter)
     }
@@ -41,7 +39,7 @@ class SystemModule(
     )
     val settings = SettingsModule().settingsAccess
     val operationRunner = OperationRunner(
-        output = outputLayout,
+        output = outputElement,
         runScope = ioScope,
         logger = logger,
         clock = clock,
@@ -50,7 +48,7 @@ class SystemModule(
     val appsModule = AppsModule(
         systemInfoAccess = systemInfo,
         multitoolSettings = settings,
-        output = outputLayout,
+        output = outputElement,
         terminal = terminal,
         logger = logger,
     )
@@ -61,18 +59,7 @@ class SystemModule(
         clock = clock,
         logger = logger,
     )
-    val renderer = TerminalRenderer(
-        renderers = listOf(
-            TextRenderer(
-                terminal = terminal,
-                logger = logger,
-            ),
-            StatusRenderer(
-                terminal = terminal,
-                logger = logger,
-            ),
-        ),
-    )
+    val renderer = TerminalPresenter()
     val exceptionHandler: ExceptionHandler = CompositeExceptionHandler(
         listOf(
             SimpleErrorHandler(logger),

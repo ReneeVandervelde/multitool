@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.bundles.kotlin.extensions)
     implementation(libs.local.settings)
     implementation(libs.ink.ui.structures)
+    implementation(libs.ink.ui.render.terminal)
     implementation(libs.bundles.ktor.client)
     implementation(libs.apache.commons.compress)
 }
