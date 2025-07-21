@@ -8,13 +8,13 @@ import com.reneevandervelde.system.exceptions.simpleError
 import com.reneevandervelde.system.info.SystemSettings
 import com.reneevandervelde.system.info.systemSettings
 import com.reneevandervelde.system.processes.*
-import com.reneevandervelde.system.render.TtyLayout
+import ink.ui.structures.elements.StackElement
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.first
 
 class MultitoolSelf(
     private val settings: MultitoolSettings,
-    private val output: TtyLayout,
+    private val output: StackElement,
     private val terminal: Terminal,
     private val logger: KimchiLogger,
 ): Updatable {

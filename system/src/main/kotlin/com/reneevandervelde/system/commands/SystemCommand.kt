@@ -11,6 +11,8 @@ import com.reneevandervelde.system.SystemModule
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.exceptions.ExceptionHandleResult
 import com.reneevandervelde.system.processes.ExitCode
+import ink.ui.render.terminal.bindAndPresent
+import ink.ui.structures.layouts.ScrollingListLayout
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,7 +28,7 @@ abstract class SystemCommand: CliktCommand()
         )
     }
     val logger by lazy { module.formattedLogger }
-    val output by lazy { module.outputLayout }
+    val output by lazy { module.outputElement }
     abstract val errors: List<DocumentedResult>
 
     final override fun helpEpilog(context: Context): String {
@@ -47,7 +49,7 @@ abstract class SystemCommand: CliktCommand()
     {
         runBlocking {
             val renderJob = module.defaultScope.launch {
-                module.renderer.render(output)
+                module.renderer.bindAndPresent(ScrollingListLayout(output))
             }
 
             runCatching {

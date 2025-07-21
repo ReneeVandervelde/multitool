@@ -1,8 +1,8 @@
 package com.reneevandervelde.system.processes
 
 import com.inkapplications.standard.CompositeException
-import com.reneevandervelde.system.render.TtyLayout
-import com.reneevandervelde.system.render.println
+import ink.ui.structures.elements.StackElement
+import ink.ui.structures.elements.println
 import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -11,7 +11,7 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration
 
 class OperationRunner(
-    val output: TtyLayout,
+    val output: StackElement,
     val runScope: CoroutineScope,
     val logger: KimchiLogger,
     val clock: Clock,

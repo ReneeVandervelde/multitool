@@ -9,10 +9,10 @@ import com.reneevandervelde.system.commands.configure.ConfigurationStatus.Error
 import com.reneevandervelde.system.commands.configure.ConfigurationStatus.NotConfigured
 import com.reneevandervelde.system.exceptions.DocumentedResult
 import com.reneevandervelde.system.processes.ExitCode
-import com.reneevandervelde.system.render.println
 import ink.ui.structures.Sentiment
 import ink.ui.structures.TextStyle
 import ink.ui.structures.elements.StatusIndicatorElement
+import ink.ui.structures.elements.println
 
 object ConfigurationCommand: SystemCommand()
 {

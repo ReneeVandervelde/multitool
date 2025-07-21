@@ -5,7 +5,7 @@ import com.reneevandervelde.settings.MultitoolSettings
 import com.reneevandervelde.system.info.SystemInfoAccess
 import com.reneevandervelde.system.apps.structures.PackageManager
 import com.reneevandervelde.system.apps.structures.Updatable
-import com.reneevandervelde.system.render.TtyLayout
+import ink.ui.structures.elements.StackElement
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import kimchi.logger.KimchiLogger
@@ -13,7 +13,7 @@ import kimchi.logger.KimchiLogger
 class AppsModule(
     systemInfoAccess: SystemInfoAccess,
     multitoolSettings: MultitoolSettings,
-    output: TtyLayout,
+    output: StackElement,
     terminal: Terminal,
     logger: KimchiLogger,
 ) {
