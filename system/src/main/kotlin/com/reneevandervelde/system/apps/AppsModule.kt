@@ -46,5 +46,6 @@ class AppsModule(
         multitoolSelf,
         *packageManagers.toTypedArray(),
         resilioSync,
+        Fwupd(systemInfoAccess, output),
     )
 }
