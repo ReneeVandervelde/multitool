@@ -73,6 +73,11 @@ class CachedTaskDataAccess(
         }
     }.distinctUntilChanged()
 
+    override fun refresh()
+    {
+        latestCache.value = null
+    }
+
     override suspend fun markDone(task: PageId)
     {
         notionApi.updatePage(

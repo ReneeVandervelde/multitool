@@ -4,6 +4,14 @@ import ink.ui.structures.elements.UiElement
 
 data class TaskRowElement(
     val task: TaskPage,
-    val completeTask: suspend () -> Unit,
-    val resetTask: suspend () -> Unit,
-): UiElement.Interactive
+    val completeTask: () -> Unit,
+    val resetTask: () -> Unit,
+    val displayState: State = State.Todo,
+): UiElement.Interactive {
+    enum class State {
+        Todo,
+        Completing,
+        Completed,
+        Resetting,
+    }
+}
