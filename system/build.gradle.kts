@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.ink.ui.render.terminal)
     implementation(libs.bundles.ktor.client)
     implementation(libs.apache.commons.compress)
+    implementation(libs.ink.ui.render.terminal)
 }
 
 tasks.register("install", Exec::class) {
