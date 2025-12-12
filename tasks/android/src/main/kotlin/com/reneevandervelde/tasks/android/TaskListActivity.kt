@@ -1,10 +1,17 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.reneevandervelde.tasks.android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.reneevandervelde.tasks.ManagementModule
 import com.reneevandervelde.tasks.NotionConfigDatabase
@@ -12,6 +19,8 @@ import ink.ui.render.compose.ComposeRenderer
 import ink.ui.render.compose.theme.defaultTheme
 import ink.ui.structures.elements.ButtonElement
 import ink.ui.structures.layouts.ScrollingListLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -29,7 +38,8 @@ class TaskListActivity: ComponentActivity()
         val managementModule = ManagementModule(
             configAccess = NotionConfigDatabase(
                 settings = settingsModule.settingsAccess,
-            )
+            ),
+            ioScope = CoroutineScope(Dispatchers.IO),
         )
 
         setContent {
@@ -64,9 +74,16 @@ class TaskListActivity: ComponentActivity()
                         )
                     }
             } else {
-                renderer.render(
-                    uiLayout = state ?: ScrollingListLayout()
-                )
+                PullToRefreshBox(
+                    isRefreshing = false,
+                    onRefresh = {
+                        managementModule.view.refresh()
+                    },
+                ) {
+                    renderer.render(
+                        uiLayout = state ?: ScrollingListLayout()
+                    )
+                }
             }
         }
     }

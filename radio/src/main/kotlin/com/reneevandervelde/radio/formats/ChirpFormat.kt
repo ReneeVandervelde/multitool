@@ -17,6 +17,7 @@ import inkapplications.spondee.structure.value
 enum class ChirpVariant {
     Uv5r,
     BfF8hp,
+    TDH3,
 }
 @OptIn(SimpleNumberFormats::class)
 class ChirpFormat(
@@ -90,6 +91,10 @@ class ChirpFormat(
                         ChirpVariant.Uv5r -> when (channel.transmit) {
                             Max, High, Medium -> "4.0W"
                             else -> "1.0W"
+                        }
+                        ChirpVariant.TDH3 -> when (channel.transmit) {
+                            Max, High, Medium -> "5.0W"
+                            else -> "2.0W"
                         }
                         ChirpVariant.BfF8hp -> when (channel.transmit) {
                             Max, High -> "8.0W"

@@ -55,5 +55,6 @@ dependencies {
     implementation(compose.runtime)
     implementation(compose.foundation)
     implementation(compose.components.resources)
+    implementation(libs.androidx.compose.material3)
     implementation(project(":task-manager"))
 }
