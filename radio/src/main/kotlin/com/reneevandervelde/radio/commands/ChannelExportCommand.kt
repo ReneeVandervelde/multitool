@@ -25,6 +25,7 @@ object ChannelExportCommand: CliktCommand(
     val format by option().choice(
         "chirp-uv5r",
         "chirp-bff8hp",
+        "chirp-tdh3",
         "cps-channels",
         "cps-zones",
         "cps-talkgroups",
@@ -74,6 +75,7 @@ object ChannelExportCommand: CliktCommand(
             val formatter: RadioExportFormat = when (format) {
                 "chirp-uv5r" -> ChirpFormat(ChirpVariant.Uv5r)
                 "chirp-bff8hp" -> ChirpFormat(ChirpVariant.BfF8hp)
+                "chirp-tdh3" -> ChirpFormat(ChirpVariant.TDH3)
                 "cps-channels" -> CpsChannelFormat
                 "cps-zones" -> CpsZoneFormat
                 "cps-talkgroups" -> CpsTalkgroupFormat
