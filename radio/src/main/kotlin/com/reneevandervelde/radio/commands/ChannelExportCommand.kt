@@ -92,8 +92,10 @@ object ChannelExportCommand: CliktCommand(
                 it.values.joinToString(",")
             }
 
-            println(headerRow)
-            valueRows.forEach(::println)
+            print("$headerRow\r\n")
+            valueRows.forEach {
+                print("$it\r\n")
+            }
         }
     }
 }
