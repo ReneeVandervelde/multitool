@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+__DIR__="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";
+LOCKS_DIR=$__DIR__/../../resources/locks;
+
+status_success() {
+    echo " - $1: $(tput setaf 2)SUCCESS$(tput sgr0)";
+}
+
+status_skipped() {
+    echo " - $1: $(tput setaf 5)SKIPPED$(tput sgr0)";
+}
+
+status_failed() {
+    echo " - $1: $(tput setaf 1)FAILED$(tput sgr0) (code: $2)";
+}
+
+prefix_capture() {
+    local name=$(basename "$1")
+    if [[ "$name" == "sudo" ]]; then
+        name=$(basename "$2");
+    fi
+
+    "$@" | sed "s/^/$(tput setaf 8)$name >$(tput sgr0) /";
+    return ${PIPESTATUS[0]};
+}
+
+status() {
+    case $2 in
+        0)
+            status_success "$1";
+            ;;
+        255)
+            status_skipped "$1";
+            ;;
+        *)
+            status_failed "$1" "$2";
+            ;;
+    esac
+}
+
+await_status() {
+    wait $1;
+    status $2 $?;
+}
+
+simple_update() {
+    local cmd="$1"
+    if [[ "$cmd" == "sudo" ]]; then
+        cmd="$2";
+    fi
+
+    if command -v "$cmd" &> /dev/null; then
+        prefix_capture "$@" || return $?;
+        return 0;
+    else
+        return 255;
+    fi
+}
+
+update_homebrew() {
+    if command -v brew &> /dev/null; then
+        prefix_capture brew update || return $?;
+        prefix_capture brew upgrade || return $?;
+        prefix_capture brew cleanup || return $?;
+        return 0;
+    else
+        return 255;
+    fi
+}
+
+update_npm() {
+    if command -v npm &> /dev/null; then
+        prefix_capture npm install npm -g || return $?;
+        prefix_capture npm update -g || return $?;
+        return 0;
+    else
+        return 255;
+    fi
+}
+
+update_rslsync() {
+    if command -v rslsync &> /dev/null; then
+        prefix_capture "$__DIR__/binary-update" "$(which rslsync)" "$LOCKS_DIR/rslsync_x64.lock.properties" || return $?;
+        return 0;
+    else
+        return 255;
+    fi
+}
+
+help() {
+    echo "Usage: system-update";
+    echo "";
+    echo "Updates all package managers available on the system";
+}
+
+main() {
+    sudo -v || exit 1;
+    echo "$(tput setaf 4)$(tput bold)Running system updates$(tput sgr0)";
+
+    simple_update sudo dnf upgrade -y &
+    pid_dnf=$!;
+
+    simple_update rpm-ostree upgrade &
+    pid_rpmostree=$!;
+
+    simple_update flatpak update -y &
+    pid_flatpak=$!;
+
+    simple_update sudo fwupdmgr update &
+    pid_fwupd=$!;
+
+    update_homebrew &
+    pid_homebrew=$!;
+
+    update_npm &
+    pid_npm=$!;
+
+    simple_update sudo snap refresh &
+    pid_snap=$!;
+
+    update_rslsync &
+    pid_rslsync=$!;
+
+    wait $pid_rpmostree $pid_flatpak $pid_dnf $pid_fwupd $pid_homebrew $pid_npm $pid_snap $pid_rslsync;
+    echo "$(tput setaf 2)$(tput bold)Updates complete$(tput sgr0)";
+    await_status $pid_rpmostree "OSTree";
+    await_status $pid_flatpak "Flatpak";
+    await_status $pid_dnf "DNF";
+    await_status $pid_fwupd "Fwupd";
+    await_status $pid_homebrew "Homebrew";
+    await_status $pid_npm "NPM";
+    await_status $pid_snap "Snap";
+    await_status $pid_rslsync "ResilioSync";
+}
+
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    help;
+    exit 0;
+fi
+
+main "$@"
