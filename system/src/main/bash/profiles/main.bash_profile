@@ -5,11 +5,11 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   SOURCE="$(readlink "$SOURCE")"
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
-export PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )/../../../.." >/dev/null 2>&1 && pwd )"
+export MT_PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )/../../../../.." >/dev/null 2>&1 && pwd )"
 
 # Load in profile sources:
-for f in $PROJECT_ROOT/src/main/bash/profiles/*.bash_profile; do
-    if [[ "$f" == "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" ]]; then continue; fi
+for f in $MT_PROJECT_ROOT/system/src/main/bash/profiles/*.bash_profile; do
+    if [[ "$f" == "$MT_PROJECT_ROOT/system/src/main/bash/profiles/main.bash_profile" ]]; then continue; fi
     source $f
 done
 
