@@ -57,6 +57,24 @@ simple_update() {
     fi
 }
 
+update_self() {
+    local project_dir
+    if [[ -n "$MT_PROJECT_ROOT" ]]; then
+        project_dir="$MT_PROJECT_ROOT"
+    elif [[ -n "$PROJECT_ROOT" ]]; then
+        project_dir="$PROJECT_ROOT/.."
+    else
+        return 1
+    fi
+
+    (
+        cd "$project_dir" || return 1
+        git pull --ff-only --verify-signatures https://github.com/ReneeVandervelde/multitool.git master || return $?
+        bin/gradlew system:install --no-daemon --console=plain || return $?
+    )
+    return $?
+}
+
 update_homebrew() {
     if command -v brew &> /dev/null; then
         prefix_capture brew update || return $?;
@@ -121,7 +139,10 @@ main() {
     update_rslsync &
     pid_rslsync=$!;
 
-    wait $pid_rpmostree $pid_flatpak $pid_dnf $pid_fwupd $pid_homebrew $pid_npm $pid_snap $pid_rslsync;
+    update_self &
+    pid_self=$!;
+
+    wait $pid_rpmostree $pid_flatpak $pid_dnf $pid_fwupd $pid_homebrew $pid_npm $pid_snap $pid_rslsync $pid_self;
     echo "$(tput setaf 2)$(tput bold)Updates complete$(tput sgr0)";
     await_status $pid_rpmostree "OSTree";
     await_status $pid_flatpak "Flatpak";
@@ -131,6 +152,7 @@ main() {
     await_status $pid_npm "NPM";
     await_status $pid_snap "Snap";
     await_status $pid_rslsync "ResilioSync";
+    await_status $pid_self "Multitool";
 }
 
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
