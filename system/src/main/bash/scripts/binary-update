@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+main() {
+    local target_bin="$1";
+    local properties_config="$2";
+
+    if [ ! -f "$target_bin" ]; then
+        return 255;
+    fi
+
+    if [ ! -f "$properties_config" ]; then
+        echo "$(tput setaf 1)Properties config file $properties_config not found$(tput sgr0)";
+        return 1;
+    fi
+
+    local hash=$(grep "^sha256=" "$properties_config" | cut -d'=' -f2-);
+    local url=$(grep "^url=" "$properties_config" | cut -d'=' -f2-);
+
+    if [[ -z "$hash" ]]; then
+        echo "$(tput setaf 1)Missing hash in $properties_config$(tput sgr0)";
+        return 1;
+    fi
+
+    if [[ -z "$url" ]]; then
+        echo "$(tput setaf 1)Missing url in $properties_config$(tput sgr0)";
+        return 1;
+    fi
+
+    local current_hash=$(sha256sum "$target_bin" | cut -d' ' -f1);
+
+    if [[ "$current_hash" == "$hash" ]]; then
+        echo "$target_bin UP-TO-DATE";
+        return 0;
+    fi
+
+    echo "Downloading update for $target_bin from $url";
+    local TEMP_DIR=$(mktemp -d);
+        local TEMP_FILE="$TEMP_DIR/$(basename "$target_bin").tar.gz";
+        curl -L -o "$TEMP_FILE" "$url" || return $?;
+        tar -xf "$TEMP_FILE" -C "$TEMP_DIR" || return $?;
+
+        local extracted_bin="$TEMP_DIR/$(basename "$target_bin")"
+        if [ ! -f "$extracted_bin" ]; then
+            echo "$(tput setaf 1)Extracted tar did not contain binary.$(tput sgr0)";
+            rm -rf "$TEMP_DIR";
+            return 1;
+        fi
+
+        local extracted_hash=$(sha256sum "$extracted_bin" | cut -d' ' -f1)
+
+        if [[ "$extracted_hash" != "$hash" ]]; then
+            echo "$(tput setaf 1)Hash mismatch for $target_bin$(tput sgr0)";
+            rm -rf "$TEMP_DIR";
+            return 1;
+        fi
+
+        mv "$extracted_bin" "$target_bin";
+        chmod +x "$target_bin";
+    rm -rf "$TEMP_DIR";
+
+    echo "$target_bin update complete";
+}
+
+help() {
+    echo "USAGE: binary-update <target> <lockfile>";
+    echo "";
+    echo "ARGUMENTS";
+    echo "    target - The binary file to be updated";
+    echo "    lockfile - The properties file containing a url and SHA lock info";
+    echo "";
+    echo "RETURNS";
+    echo "    0 - Success/Binary is up to date.";
+    echo "    1 - Unexpected Error. See output.";
+    echo "    255 - Target binary does not exist.";
+}
+
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    help;
+    exit 0;
+fi
+
+main "$@";
