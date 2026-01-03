@@ -68,9 +68,10 @@ update_self() {
     fi
 
     (
-        cd "$project_dir" || return 1
-        git pull --ff-only --verify-signatures https://github.com/ReneeVandervelde/multitool.git master || return $?
-        bin/gradlew system:install --no-daemon --console=plain || return $?
+        cd "$project_dir" || return 1;
+        git pull --ff-only --verify-signatures https://github.com/ReneeVandervelde/multitool.git master || return $?;
+        system/src/main/bash/install;
+        bin/gradlew system:install --no-daemon --console=plain || return $?;
     )
     return $?
 }
