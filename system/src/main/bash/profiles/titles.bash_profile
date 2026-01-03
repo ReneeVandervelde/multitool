@@ -13,7 +13,7 @@ function __setTitle() {
 function __setDefaultTitle() {
     if [ -z ${__TITLE_OVERRIDE+x} ]; then
         case "$BASH_COMMAND" in
-            "__prompt_command")
+            "__prompt_command"|"__vte_osc7"|"__systemd_osc_context_precmdline")
                 __setTitle $(hostname) - $(basename $PWD)
                 ;;
             *)
