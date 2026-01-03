@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # Resolve project root
-SOURCE="${BASH_SOURCE[0]}"
+SOURCE="${BASH_SOURCE[0]}";
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )";
+  SOURCE="$(readlink "$SOURCE")";
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
-PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )/../../.." >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )/../../.." >/dev/null 2>&1 && pwd )";
 
 relink() {
     local target="$1";
@@ -17,7 +17,7 @@ relink() {
         echo "Removing existing symlink at: $destination";
         rm -v "$destination" || return $?;
     elif [ -f "$destination" ]; then
-        echo "Archiving existing file at: $destination"
+        echo "Archiving existing file at: $destination";
         local timestamp=$(date +"%Y%m%d%H%M%S");
         local archive="$(dirname "$destination")"/.archive-"$timestamp"."$(basename "$destination")";
         mv -v "$destination" "$archive" || return $?;
@@ -29,14 +29,13 @@ relink() {
     ln -sv -- "$target" "$destination";
 }
 
-echo "Linking Bash Config"
-relink "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" "$HOME/.bash_profile" || exit $?
-source "$HOME/.bash_profile" || exit $?
+echo "Linking Bash Config";
+relink "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" "$HOME/.bash_profile" || exit $?;
+source "$HOME/.bash_profile" || exit $?;
 
-echo "Linking Ghostty Config"
-relink "$PROJECT_ROOT/src/main/resources/configs/ghostty.properties" "$HOME/.config/ghostty/config"
+echo "Linking Ghostty Config";
+relink "$PROJECT_ROOT/src/main/resources/configs/ghostty.properties" "$HOME/.config/ghostty/config" || exit $?;
 
-echo "Linking Git Configs"
-relink "$PROJECT_ROOT/src/main/resources/configs/global.gitconfig" "$HOME/.gitconfig"
-relink "$PROJECT_ROOT/src/main/resources/configs/global.gitignore" "$HOME/.gitignore"
-
+echo "Linking Git Configs";
+relink "$PROJECT_ROOT/src/main/resources/configs/global.gitconfig" "$HOME/.gitconfig" || exit $?;
+relink "$PROJECT_ROOT/src/main/resources/configs/global.gitignore" "$HOME/.gitignore" || exit $?;

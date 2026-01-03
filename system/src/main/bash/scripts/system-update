@@ -70,7 +70,7 @@ update_self() {
     (
         cd "$project_dir" || return 1;
         git pull --ff-only --verify-signatures https://github.com/ReneeVandervelde/multitool.git master || return $?;
-        system/src/main/bash/install;
+        system/src/main/bash/install || return $?;
         bin/gradlew system:install --no-daemon --console=plain || return $?;
     )
     return $?
