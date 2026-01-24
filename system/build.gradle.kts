@@ -26,5 +26,5 @@ dependencies {
 tasks.register("install", Exec::class) {
     dependsOn("installDist")
     workingDir = project.rootDir
-    commandLine("${project.rootDir.absolutePath}/src/main/bash/install-profile")
+    commandLine("${project.rootDir.absolutePath}/src/main/bash/install")
 }
