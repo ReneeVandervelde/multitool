@@ -1,0 +1,238 @@
+#!/usr/bin/env bash
+
+prepare() {
+    if [[ "$WARD_HOME" == "" ]]; then
+        export WARD_HOME="$HOME/.ward"
+    fi
+    mkdir -p "$WARD_HOME"
+    mkdir -p "$WARD_HOME/temp"
+    export WARD_TEMP_DIR=$(mktemp -d "$WARD_HOME/temp/ward-XXXX")
+
+    trap close EXIT
+    if [[ -z "$WARD_HARDWARE" ]]; then
+        export WARD_HARDWARE="$WARD_HOME/hardware-manifest.csv"
+    fi
+
+    if [[ ! -f "$WARD_HARDWARE" ]]; then
+        echo "Hardware manifest not found at '$WARD_HARDWARE'"
+        exit 1
+    fi
+
+    local type_col=$(__get_csv_column_index "Type")
+    local fingerprint_col=$(__get_csv_column_index "Fingerprint")
+
+    if [[ $type_col -eq -1 || $fingerprint_col -eq -1 ]]; then
+        echo "Could not find 'Type' or 'Fingerprint' columns in '$WARD_HARDWARE'"
+        exit 1
+    fi
+
+    while IFS=';' read -r type fingerprint; do
+        if [[ "${type//$'\r'/}" == "primary" ]]; then
+            export WARD_PRIMARY_KEY=${fingerprint//$'\r'/}
+            break
+        fi
+    done < <(tail -n +2 "$WARD_HARDWARE" | cut -d';' -f"$type_col,$fingerprint_col")
+
+    if [[ -z "$WARD_PRIMARY_KEY" ]]; then
+        echo "No primary key found in '$WARD_HARDWARE'"
+        exit 1
+    fi
+}
+
+close() {
+    if [[ -d "$WARD_TEMP_DIR" ]]; then
+        find "$WARD_TEMP_DIR" -type f -exec shred -u {} +
+        rm -rf "$WARD_TEMP_DIR"
+    fi
+}
+
+encrypt() {
+    local target="$1"
+    local output="$2"
+
+    echo "Encrypting file: '$target'"
+
+    if [[ -d "$target" ]]; then
+        if [[ "$output" == "" ]]; then
+            output="$target.tar.gz.asc"
+        fi
+        local tar_output="$WARD_TEMP_DIR/$(basename "$target").tar.gz"
+        echo "Target is a directory, will be compressed"
+        tar -czvf "$tar_output" -C "$target" . || return $?
+        encrypt "$tar_output" "$output" || return $?
+    elif [[ -f "$target" ]]; then
+        if [[ "$output" == "" ]]; then
+            output="$target.asc"
+        fi
+        gpg --encrypt --armor -r "$WARD_PRIMARY_KEY" -o "$output" "$target" || return $?
+    else
+        echo "Target does not exist: '$target'"
+        return 1
+    fi
+}
+
+decrypt() {
+    local target="$1"
+
+    if [[ "$target" == *.asc ]]; then
+        local output="${target%.asc}"
+    else
+        local output="decrypted-$(basename "$target")"
+    fi
+
+    echo "Decrypting file: '$target'"
+
+    if [[ ! -f "$target" ]]; then
+        echo "Target does not exist: '$target'"
+        return 1
+    fi
+
+    if [[ -e "$output" ]]; then
+        echo "Error: Output already exists: '$output'."
+        return 1
+    fi
+
+     gpg --decrypt $target > $output || return 1;
+}
+
+__get_csv_column_index() {
+    local column_name="$1"
+    local header=$(head -n 1 "$WARD_HARDWARE")
+    IFS=';' read -r -a columns <<< "$header"
+    for i in "${!columns[@]}"; do
+        local col_name_cleaned=$(echo "${columns[$i]}" | tr -d '\r')
+        if [[ "$col_name_cleaned" == "$column_name" ]]; then
+            echo "$((i + 1))"
+            return 0
+        fi
+    done
+    echo "-1"
+}
+
+layer() {
+    if [[ ! -f "$WARD_HARDWARE" ]]; then
+        echo "Hardware manifest not found at '$WARD_HARDWARE'"
+        exit 1
+    fi
+    local target="$1"
+    local label_col=$(__get_csv_column_index "Label")
+    local fingerprint_col=$(__get_csv_column_index "Fingerprint")
+
+    if [[ $label_col -eq -1 || $fingerprint_col -eq -1 ]]; then
+        echo "Could not find 'Label' or 'Fingerprint' columns in '$WARD_HARDWARE'"
+        exit 1
+    fi
+
+    local fingerprints=()
+    local labels=()
+    while IFS=';' read -r label fingerprint; do
+        if [[ -n "$label" && -n "$fingerprint" ]]; then
+            labels+=("$label")
+            fingerprints+=("$fingerprint")
+        fi
+    done < <(tail -n +2 "$WARD_HARDWARE" | cut -d';' -f"$label_col,$fingerprint_col")
+
+    local count=${#labels[@]}
+
+    local outputs="$WARD_TEMP_DIR/outputs"
+    mkdir -p "$outputs"
+
+    for ((inner=0; inner<count; inner++)); do
+        for ((outer=inner+1; outer<count; outer++)); do
+            local temp="$WARD_TEMP_DIR/$(basename "$target")-${labels[inner]}.asc"
+            local output="$outputs/$(basename "$target")-${labels[inner]}-${labels[outer]}.asc"
+
+            echo "Encrypting sequence: ${labels[inner]} (${fingerprints[inner]: -4}) -> ${labels[outer]} (${fingerprints[outer]: -4})"
+
+            if [[ ! -f "$temp" ]]; then
+                gpg --encrypt --armor -r "${fingerprints[inner]}" --output "$temp" "$target" || return $?
+            fi
+
+            gpg --encrypt --armor -r "${fingerprints[outer]}" --output "$output" "$temp" || return $?
+        done
+    done
+
+    tar -czvf "$(basename "$target").ward" -C "$outputs" . || return $?
+}
+
+delayer() {
+    local target="$1"
+    local label1="$2"
+    local label2="$3"
+
+    if [[ "$#" -ne 3 ]]; then
+        echo "Usage: ward delayer <file> <label1> <label2>"
+        return 1
+    fi
+
+    if [[ ! -f "$target" ]]; then
+        echo "Target does not exist: '$target'"
+        return 1
+    fi
+
+    local extract_dir="$WARD_TEMP_DIR/extracted"
+    mkdir -p "$extract_dir"
+    tar -xzvf "$target" -C "$extract_dir" || return $?
+
+    local base_name="$(basename "$target" .ward)"
+
+    if [[ -f "$extract_dir/$base_name-$label1-$label2.asc" ]]; then
+        local encrypted_file="$extract_dir/$base_name-$label1-$label2.asc"
+    elif [[ -f "$extract_dir/$base_name-$label2-$label1.asc" ]]; then
+        local encrypted_file="$extract_dir/$base_name-$label2-$label1.asc"
+    else
+        echo "Could not find the encrypted file for labels $label1 and $label2 in the archive."
+        return 1
+    fi
+
+    local output="${target%.ward}"
+
+    if [[ -e "$output" ]]; then
+        output="${output}-delayered-$(date +%s)"
+    fi
+
+    local temp="$WARD_TEMP_DIR/$(basename "$encrypted_file").l1"
+    gpg --decrypt --output "$temp" "$encrypted_file" || return $?
+    gpg --decrypt --output "$output" "$temp" || return $?
+
+    echo "De-layered to: $output"
+}
+
+help() {
+    echo "Usage: ward <command>"
+    echo ""
+    echo "Commands:"
+    echo "  encrypt <file>    Encrypts the specified file."
+    echo "  decrypt <file>    Decrypts the specified file."
+    echo "  layer <file>      Encrypts a file with multiple layers of encryption."
+    echo "  delayer <file> <label1> <label2>    Decrypts a multi-layer encrypted file."
+    echo ""
+    echo "Environment Variables:"
+    echo "  WARD_HARDWARE    Path to the hardware manifest CSV file (default: ~/.ward/hardware-manifest.csv)"
+}
+
+main() {
+    local command="$1"
+    shift
+    prepare
+
+    case "$command" in
+        encrypt)
+            encrypt "$@"
+            ;;
+        decrypt)
+            decrypt "$@"
+            ;;
+        layer)
+            layer "$@"
+            ;;
+        delayer)
+            delayer "$@"
+            ;;
+        *)
+            help
+            ;;
+    esac
+}
+
+main "$@"
