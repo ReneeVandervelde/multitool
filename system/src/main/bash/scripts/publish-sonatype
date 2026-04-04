@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+MAVEN_BASEURL="https://ossrh-staging-api.central.sonatype.com"
+REPO_LIST_URL="$MAVEN_BASEURL/manual/search/repositories?ip=any"
+TMP_RESPONSE_FILE=$(mktemp "${TMPDIR:-/tmp}/publish-sonatype.XXXXXX") || {
+  echo "Failed to create temporary response file." >&2
+  exit 1
+}
+trap 'rm -f "$TMP_RESPONSE_FILE"' EXIT
+
+read -p "Token Username: " USERNAME
+read -s -p "Token Password: " PASSWORD
+echo
+AUTH=$(echo -n "$USERNAME:$PASSWORD" | base64)
+
+main() {
+    echo "Fetching open staging repositories..."
+    RESPONSE=$(curl -s -H "Authorization: Bearer $AUTH" "$REPO_LIST_URL")
+
+    REPO_KEYS=$(echo "$RESPONSE" | jq -r '.repositories[] | select(.state == "open") | .key')
+    if [ -z "$REPO_KEYS" ]; then
+      echo "No open repositories found."
+      exit 0
+    fi
+
+    for KEY in $REPO_KEYS; do
+      echo "Triggering auto-release of: $KEY"
+      RELEASE_URL="$MAVEN_BASEURL/manual/upload/repository/$KEY?publishing_type=user_managed"
+      RESP=$(curl -s -w "%{http_code}" -o "$TMP_RESPONSE_FILE" \
+        -X POST -H "Authorization: Bearer $AUTH" "$RELEASE_URL")
+
+      if [ "$RESP" -ne 200 ]; then
+        echo "Failed to release $KEY (HTTP $RESP)"
+        cat "$TMP_RESPONSE_FILE"
+        exit 1
+      fi
+    done
+
+    echo "All open repositories triggered for auto-release."
+}
+
+main "$@"
