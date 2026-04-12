@@ -1,0 +1,18 @@
+{
+  "description": "Control Center in command space",
+  "manipulators": [
+    {
+      "from": {
+        "key_code": "spacebar",
+        "modifiers": { "mandatory": ["control"] }
+      },
+      "to": [
+        {
+          "key_code": "up_arrow",
+          "modifiers": "left_control"
+        }
+      ],
+      "type": "basic"
+    }
+  ]
+}

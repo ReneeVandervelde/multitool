@@ -1,0 +1,15 @@
+{
+  "description": "Home to Command Left",
+  "manipulators": [
+    {
+      "from": { "key_code": "home" },
+      "to": [
+        {
+          "key_code": "a",
+          "modifiers": "left_control"
+        }
+      ],
+      "type": "basic"
+    }
+  ]
+}

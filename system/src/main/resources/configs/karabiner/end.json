@@ -1,0 +1,15 @@
+{
+  "description": "End to Command Right",
+  "manipulators": [
+    {
+      "from": { "key_code": "end" },
+      "to": [
+        {
+          "key_code": "e",
+          "modifiers": "left_control"
+        }
+      ],
+      "type": "basic"
+    }
+  ]
+}
