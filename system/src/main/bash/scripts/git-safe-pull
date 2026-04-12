@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+REMOTE=$1
+BRANCH=$2
+
+if [[ "$REMOTE" == "" ]] || [[ "$BRANCH" == "" ]]; then
+    echo "Usage: git-safe-pull REMOTE BRANCH"
+    exit $EXIT_ILLEGAL_ARG
+fi
+
+git pull --ff-only --verify-signatures $REMOTE $BRANCH || exit $EXIT_UNEXPECTED
