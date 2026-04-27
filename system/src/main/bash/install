@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail;
+
 # Resolve project root
 SOURCE="${BASH_SOURCE[0]}";
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -15,12 +17,12 @@ relink() {
 
     if [ -L "$destination" ]; then
         echo "Removing existing symlink at: $destination";
-        rm -v "$destination" || return $?;
+        rm -v "$destination"
     elif [ -f "$destination" ]; then
         echo "Archiving existing file at: $destination";
         local timestamp=$(date +"%Y%m%d%H%M%S");
         local archive="$(dirname "$destination")"/.archive-"$timestamp"."$(basename "$destination")";
-        mv -v "$destination" "$archive" || return $?;
+        mv -v "$destination" "$archive"
     elif [ -e "$destination" ]; then
         echo "Unexpected file type at $destination";
         return 1;
@@ -30,12 +32,20 @@ relink() {
 }
 
 echo "Linking Bash Config";
-relink "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" "$HOME/.bash_profile" || exit $?;
-source "$HOME/.bash_profile" || exit $?;
+relink "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" "$HOME/.bash_profile"
+source "$HOME/.bash_profile"
 
 echo "Linking Ghostty Config";
-relink "$PROJECT_ROOT/src/main/resources/configs/ghostty.properties" "$HOME/.config/ghostty/config" || exit $?;
+relink "$PROJECT_ROOT/src/main/resources/configs/ghostty.properties" "$HOME/.config/ghostty/config"
 
 echo "Linking Git Configs";
-relink "$PROJECT_ROOT/src/main/resources/configs/global.gitconfig" "$HOME/.gitconfig" || exit $?;
-relink "$PROJECT_ROOT/src/main/resources/configs/global.gitignore" "$HOME/.gitignore" || exit $?;
+relink "$PROJECT_ROOT/src/main/resources/configs/global.gitconfig" "$HOME/.gitconfig"
+relink "$PROJECT_ROOT/src/main/resources/configs/global.gitignore" "$HOME/.gitignore"
+
+BASH_LINK_DEFAULT="$(which bash)"
+BASH_LINK="$HOME/.local/bin/bash"
+if [ ! -f "$BASH_LINK" ]; then
+    read -p "local bash target not found ($BASH_LINK). Set path ($BASH_LINK_DEFAULT): " BASH_TARGET;
+    BASH_TARGET="${BASH_TARGET:-$BASH_LINK_DEFAULT}"
+fi
+relink "BASH_TARGET" "$BASH_LINK"
