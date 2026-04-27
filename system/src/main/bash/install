@@ -37,7 +37,7 @@ if [ ! -f "$BASH_LINK" ]; then
     read -p "local bash target not found ($BASH_LINK). Set path ($BASH_LINK_DEFAULT): " BASH_TARGET;
     BASH_TARGET="${BASH_TARGET:-$BASH_LINK_DEFAULT}"
 fi
-relink "BASH_TARGET" "$BASH_LINK"
+relink "$BASH_TARGET" "$BASH_LINK"
 
 echo "Linking Bash Config";
 relink "$PROJECT_ROOT/src/main/bash/profiles/main.bash_profile" "$HOME/.bash_profile"

@@ -1,3 +1,3 @@
-if [ ! command -v ll ]; then
+if ! command -v ll; then
     alias ll="ls -alsG"
 fi
