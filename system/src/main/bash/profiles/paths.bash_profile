@@ -10,8 +10,10 @@ export PROJECT_ROOT="$( cd -P "$( dirname "$SOURCE" )/../../../.." >/dev/null 2>
 ##
 # Shared Paths
 ##
-PATH=$PATH:$PROJECT_ROOT/build/install/mt-system/bin
-PATH=$PATH:$PROJECT_ROOT/src/main/bash/scripts
+PATH=$PATH:/opt/homebrew/bin
+PATH=$PATH:"$PROJECT_ROOT/build/install/mt-system/bin"
+PATH=$PATH:"$PROJECT_ROOT/src/main/bash/scripts"
+PATH=$PATH:"$HOME/.local/bin"
 PATH=$PATH:./project-bin
 PATH=$PATH:./bin
 PATH=$PATH:./
