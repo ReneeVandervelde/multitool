@@ -1,7 +1,7 @@
 [user]
     name = Renee Vandervelde
     email = "Renee@ReneeVandervelde.com"
-    signingkey = "1E3B6A09031AACF4"
+    signingkey = "B5B2ECB25A596077"
 [core]
     excludesfile = ~/.gitignore
     editor = /usr/bin/env vi
