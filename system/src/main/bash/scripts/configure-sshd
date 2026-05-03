@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail;
+CONFIG_DIR=/etc/ssh/sshd_config.d/
+TARGET="$CONFIG_DIR/90-user.conf"
+
+if [ ! -d "$CONFIG_DIR" ]; then
+    echo "sshd configurations folder not detected"
+    exit 1
+fi
+
+if sudo test -f "$TARGET"; then
+    echo "Config already exists"
+    exit 0
+fi
+
+sudo cp -v --update=none-fail "$MT_PROJECT_ROOT/system/src/main/resources/configs/sshd.conf" "$TARGET"
